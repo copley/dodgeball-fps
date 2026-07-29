@@ -29,13 +29,6 @@ func _run() -> void:
 		ProjectSettings.get_setting("display/window/vsync/vsync_mode", 0) == 1,
 		"VSync is enabled"
 	)
-	_expect(
-		ProjectSettings.get_setting(
-			"rendering/lights_and_shadows/directional_shadow/size",
-			0
-		) == 2048,
-		"directional shadow quality is moderate"
-	)
 	_expect(InputMap.has_action("toggle_performance"), "F3 diagnostic action exists")
 	var main := MAIN_SCENE.instantiate()
 	root.add_child(main)

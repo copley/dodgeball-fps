@@ -87,10 +87,11 @@ The original test-machine baseline at 1280×720 was approximately 60 FPS,
 - Use 2× MSAA as the single 3D anti-aliasing method. Screen-space
   anti-aliasing remains disabled.
 - Enable VSync for sensible pacing on a 60 Hz display.
-- Use one real-time shadow-casting directional light with a 2048-pixel
-  directional shadow map and a 35-metre shadow distance.
-- Raise ambient energy moderately for even court readability. SSAO, SSIL, SSR,
-  glow, volumetric fog, motion blur, dynamic resolution, and FSR remain off.
+- Preserve the original environment and single real-time shadow-casting
+  directional light.
+- Preserve the court's unshaded painted materials for reliable indoor
+  readability. SSAO, SSIL, SSR, glow, volumetric fog, motion blur, dynamic
+  resolution, and FSR remain off.
 - Keep floor, wall, marking, ball, and target materials non-metallic with
   painted-surface roughness. Use a brighter orange ball and warm-white target
   for separation across the blue, red, and green floor zones.
