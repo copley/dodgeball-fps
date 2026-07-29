@@ -16,7 +16,10 @@ Prove the core loop:
 
 ## Scope
 
-The pilot uses one stylized indoor court, one player, one ball, and one stationary target or simple bot. It excludes multiplayer, polished art, progression, complex AI, menus, and production release work.
+The pilot uses one stylized indoor court, one player, one ball, and one stationary
+target or simple bot. It excludes multiplayer, polished art, progression,
+complex AI, complex menus, and production release work. A basic pause overlay
+provides resume, clean round restart, controls, and quit actions.
 
 ## Visual style
 
@@ -35,13 +38,23 @@ easy to distinguish.
 - `docs/TESTING.md` — validation and play-test checklist.
 - `docs/MILESTONES.md` — current implementation milestones and roadmap.
 
-Implementation tasks T1–T5 are complete.
+Implementation tasks T1–T6 are complete.
 
 ## Controls
 
 - `WASD`: move
-- Mouse: look
-- `E`: pick up an available ball
+- Mouse: aim/look
+- `Shift`: hold to sprint
+- `Ctrl`: hold to crouch
+- `Space`: jump
 - Left mouse: hold to charge, release to throw
-- Right mouse: open the catch window
-- `Esc`: release the mouse cursor
+- Right mouse: timed catch
+- `E`: pick up/interact
+- `Q`: dodge left
+- `F`: dodge right
+- `R`: restart the current round
+- `Escape`: toggle the pause menu
+
+The pause menu releases the mouse and pauses gameplay. It includes Resume,
+Restart Round, Controls, and Quit Game; restarting closes the menu and restores
+the existing player, ball, and target without creating replacements.

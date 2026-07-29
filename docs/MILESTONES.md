@@ -42,16 +42,18 @@ Do not add:
 | M3 | Valid hit and dead-ball handling | In progress |
 | M4 | Timed catching and possession transfer | Complete |
 | M4.5 | Basic painted court graphics | Complete |
-| M5 | Lateral dodge with cooldown | Planned |
+| M5 | Complete player controls, lateral dodge, restart, and pause menu | Complete |
 | M6 | Basic ball-playing bot | Planned |
 | M7 | Complete elimination and reset loop | Planned |
 | M8 | Prototype validation and stop decision | Planned |
 
 ## Current implementation checkpoint
 
-Movement, pickup, charged throwing, target elimination, and timed catching are
-complete. The basic painted-court visual pass is also complete. Dead-ball
-handling after floor, wall, or ceiling contact is still incomplete.
+Movement, sprint, grounded jump, safe crouch, lateral dodge, clean restart,
+pickup, charged throwing, target elimination, and timed catching are complete.
+The basic painted-court visual pass and basic pause/controls menu are also
+complete. Dead-ball handling after floor, wall, or ceiling contact is still
+incomplete.
 
 ## M4.5 — Basic painted court graphics
 
@@ -139,7 +141,7 @@ handling after floor, wall, or ceiling contact is still incomplete.
 - One incoming ball cannot be caught twice.
 - Catch success never creates another ball.
 
-## M5 — Lateral dodge with cooldown
+## M5 — Player controls, lateral dodge, restart, and pause menu
 
 ### Deliverables
 
@@ -149,12 +151,20 @@ handling after floor, wall, or ceiling contact is still incomplete.
 - Dodge respects court collision and boundaries.
 - Normal movement resumes immediately after the dodge.
 - Minimal feedback communicates when dodge is unavailable.
+- Shift sprint, grounded Space jump, and hold-Ctrl safe crouch complete the
+  keyboard/mouse movement layout.
+- R cleanly restores the existing player, ball, and target.
+- Escape pauses gameplay and opens Resume, Restart Round, Controls, and Quit
+  Game actions while releasing the mouse.
 
 ### Exit criteria
 
 - Dodging can avoid a valid incoming throw.
 - The player cannot pass through court geometry.
 - Repeated dodge attempts cannot bypass the cooldown.
+- Five consecutive keyboard or menu resets retain exactly one player, one ball,
+  and one target.
+- Gameplay physics and inputs do not run through the pause overlay.
 
 ## M6 — Basic ball-playing bot
 

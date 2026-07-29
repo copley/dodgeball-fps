@@ -8,6 +8,9 @@ Deliver a playable Godot 4 proof of concept demonstrating first-person dodgeball
 
 - Move with WASD.
 - Aim with mouse look.
+- Sprint while Shift is held.
+- Jump from the ground.
+- Crouch while Ctrl is held, without standing into an obstruction.
 - Pick up the available ball when close enough.
 - Hold the throw input to charge throw strength.
 - Release to launch a physical projectile.
@@ -28,13 +31,36 @@ Deliver a playable Godot 4 proof of concept demonstrating first-person dodgeball
 
 - `WASD`: move
 - Mouse: look
-- `E`: pick up ball
+- `Shift`: hold to sprint
+- `Ctrl`: hold to crouch
+- `Space`: grounded jump
 - Left mouse: hold to charge, release to throw
 - Right mouse: catch attempt
-- `Q` / `E` or another documented pair: lateral dodge, provided pickup remains unambiguous
-- `R`: reset round during development
+- `E`: pick up/interact
+- `Q`: dodge left
+- `F`: dodge right
+- `R`: restart the current round
+- `Escape`: toggle the pause menu
 
-Final bindings may change if recorded in the README and kept internally consistent.
+## Movement, restart, and pause
+
+- Normal movement preserves the existing speed and collision handling; sprint,
+  acceleration, jump, air control, crouch dimensions, and lateral dodge timing
+  are configurable.
+- Jump is grounded-only. Crouch changes both camera and collision height, and
+  standing is refused while overhead space is obstructed.
+- Dodge is orientation-relative, collision-safe, and cooldown-limited, with
+  minimal HUD feedback while unavailable.
+- Restart restores the existing player to `PlayerSpawn`, ball to `BallSpawn` in
+  `AVAILABLE`, and target to `TargetSpawn` active. It clears movement, camera
+  pitch, crouch, dodge, catch, elimination, and feedback state without creating
+  replacement entities.
+- Escape is handled before gameplay input. The pause overlay releases the mouse,
+  pauses gameplay physics, timers, movement, and actions, and continues
+  processing while paused.
+- The pause menu offers Resume, Restart Round, Controls, and Quit Game. Controls
+  lists the fixed keyboard/mouse bindings and Back returns to the main panel.
+  Menu restart performs the clean reset, resumes, and recaptures the mouse.
 
 ## Acceptance criteria
 
@@ -48,6 +74,11 @@ Final bindings may change if recorded in the README and kept internally consiste
 8. A successful catch transfers the incoming ball to the player.
 9. Dodging produces a short lateral displacement and cannot be spammed continuously.
 10. Reset restores player, ball, target, and round state.
+11. Sprint, grounded jump, and obstruction-safe crouch preserve collision and
+	diagonal movement behavior.
+12. Pausing stops gameplay and prevents mouse or keyboard actions from passing
+	through the overlay.
+13. Five consecutive restarts leave exactly one player, one ball, and one target.
 
 ## Explicit exclusions
 

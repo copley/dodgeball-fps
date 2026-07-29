@@ -26,13 +26,19 @@ Complete tasks sequentially. Each implementation task should have its own branch
   - Add a stylized painted court, visual-only markings, gym wall treatment, and a readable indoor palette.
   - Acceptance: court colours and markings are visible, collision and spawn transforms are unchanged, and T1–T5 validation still passes.
 
-- [ ] **T6 — Lateral dodge and cooldown**
-  - Add short left/right displacement with cooldown and boundary-safe movement.
-  - Acceptance: dodge is responsive but cannot be continuously spammed.
+- [x] **T6 — Player movement actions, lateral dodge, restart, and pause menu**
+  - Add sprint, grounded jump, obstruction-safe crouch, short left/right dodge
+	with cooldown and boundary-safe movement, in-place round restart, and a
+	basic pause/controls menu.
+  - Acceptance: movement remains collision-safe and normalized; jump cannot
+	double-fire; crouch cannot stand into an obstruction; dodge is responsive
+	but cannot be spammed; pause blocks gameplay; five restarts retain exactly
+	one player, one ball, and one target.
 
 - [ ] **T7 — Round reset and pilot validation**
-  - Restore all entities and state after elimination or development reset.
-  - Acceptance: repeated rounds do not accumulate duplicate balls, signals, or score events.
+  - Perform final prototype validation and close remaining one-ball loop gaps.
+  - Acceptance: all pilot mechanics pass the final manual play-test without
+	duplicate entities, signals, or elimination events.
 
 ## Stop condition
 

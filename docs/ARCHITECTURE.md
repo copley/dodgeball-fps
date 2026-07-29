@@ -26,20 +26,23 @@ dodgeball-fps/
 │   ├── target.gd
 │   └── ui.gd
 └── assets/
-    ├── materials/
-    ├── models/
-    ├── textures/
-    └── audio/
+	├── materials/
+	├── models/
+	├── textures/
+	└── audio/
 ```
 
 ## Node responsibilities
 
-- `Main`: owns round state, spawning, elimination, and reset.
+- `Main`: owns round state, initial spawning, elimination, in-place reset, and
+  pause-menu coordination.
 - `Court`: static collision and spawn markers only.
-- `Player`: movement, mouse look, possession, throw charging, catch window, and dodge cooldown.
+- `Player`: normal/sprint movement, grounded jump, safe crouch, mouse look,
+  possession, throw charging, catch window, and collision-safe dodge cooldown.
 - `Ball`: physical motion, ownership state, collision reporting, pickup eligibility, and reset.
 - `Target`: receives valid hits and reports elimination.
-- `UI`: crosshair and minimal state indicators only.
+- `UI`: crosshair, minimal catch/dodge/result indicators, and the basic
+  pause/controls overlay.
 
 ## Communication
 
@@ -54,13 +57,19 @@ Use signals for major events such as:
 
 `Main` coordinates the round. Player and ball should not directly own global round state.
 
+`Main.restart_round()` resets the existing player, ball, and target through
+their reset methods. It must not instantiate replacements or reconnect signals.
+`Main` also handles Escape and R before ordinary player input. Its process mode,
+and the pause overlay's process mode, remain active while the `SceneTree` is
+paused; gameplay nodes retain normal processing and therefore stop.
+
 ## State boundaries
 
 Ball state should be explicit and mutually exclusive:
 
 ```text
 AVAILABLE -> HELD -> THROWN -> AVAILABLE
-                    -> CAUGHT -> HELD
+					-> CAUGHT -> HELD
 ```
 
 Player state remains lightweight:
