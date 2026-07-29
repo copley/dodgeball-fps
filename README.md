@@ -1,6 +1,7 @@
 # Dodgeball FPS
 
-A six-hour Godot 4 pilot for a first-person dodgeball game.
+A playable Godot 4 prototype for a first-person dodgeball game, built as a
+six-hour pilot.
 
 ## Pilot goal
 
@@ -25,5 +26,6 @@ The pilot uses one grey-box court, one player, one ball, and one stationary targ
 - `docs/ARCHITECTURE.md` — intended Godot structure.
 - `docs/TASKS.md` — ordered implementation queue.
 - `docs/TESTING.md` — validation and play-test checklist.
+- `docs/MILESTONES.md` — current implementation milestones and roadmap.
 
-No gameplay code is included in this planning branch.
+Implementation tasks T1–T5 are complete.

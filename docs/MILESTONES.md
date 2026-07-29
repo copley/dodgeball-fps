@@ -40,11 +40,17 @@ Do not add:
 | M1 | Playable first-person court | Complete |
 | M2 | One-ball pickup and throwing | Complete |
 | M3 | Valid hit and dead-ball handling | In progress |
-| M4 | Timed catching and possession transfer | Planned |
+| M4 | Timed catching and possession transfer | Complete |
 | M5 | Lateral dodge with cooldown | Planned |
 | M6 | Basic ball-playing bot | Planned |
 | M7 | Complete elimination and reset loop | Planned |
 | M8 | Prototype validation and stop decision | Planned |
+
+## Current implementation checkpoint
+
+Movement, pickup, charged throwing, target elimination, and timed catching are
+complete. Dead-ball handling after floor, wall, or ceiling contact is still
+incomplete.
 
 ## M1 — Playable first-person court
 
@@ -107,7 +113,8 @@ Do not add:
 - A successful catch transfers the same ball into the catcher’s possession.
 - Early and late catch attempts fail.
 - The ball cannot remain thrown while also being held.
-- A temporary test launcher may provide repeatable incoming throws until the bot exists.
+- Deterministic tests create incoming throws through the normal
+  `AVAILABLE -> HELD -> THROWN` state path.
 
 ### Exit criteria
 
