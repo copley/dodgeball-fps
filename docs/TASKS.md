@@ -10,7 +10,7 @@ Complete tasks sequentially. Each implementation task should have its own branch
   - Implement WASD movement, gravity, mouse capture, and stable camera look.
   - Acceptance: player can traverse the court predictably and cannot pass through boundaries.
 
-- [ ] **T3 — Ball pickup and charged physical throw**
+- [x] **T3 — Ball pickup and charged physical throw**
   - Implement one-ball possession, pickup range, charge duration, release velocity, and reset behaviour.
   - Acceptance: quick and full-charge throws are visibly different and use physical collisions.
 
