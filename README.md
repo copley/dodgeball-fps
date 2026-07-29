@@ -9,15 +9,15 @@ Prove the core loop:
 1. Move and look in first person.
 2. Pick up a ball.
 3. Charge and throw it with projectile physics.
-4. Hit a target.
+4. Exchange the same ball with a computer-controlled opponent.
 5. Catch an incoming ball during a short timing window.
 6. Dodge laterally.
 7. Reset the round.
 
 ## Scope
 
-The pilot uses one stylized indoor court, one player, one ball, and one stationary
-target or simple bot. It excludes multiplayer, polished art, progression,
+The pilot uses one stylized indoor court, one player, one ball, and one simple
+ball-playing bot. It excludes multiplayer, polished art, progression,
 complex AI, complex menus, and production release work. A basic pause overlay
 provides resume, clean round restart, controls, and quit actions.
 
@@ -26,7 +26,7 @@ provides resume, clean round restart, controls, and quit actions.
 The court uses a clean painted-gym palette: bright blue for the player half,
 coral red for the opponent half, court green for the centre strip and perimeter,
 and warm-white lines. Dove-grey walls, dark-navy lower trim, a light-grey
-ceiling, and charcoal accents keep the ball, target, crosshair, and boundaries
+ceiling, and charcoal accents keep the ball, bot, crosshair, and boundaries
 easy to distinguish.
 
 ## Project controls
@@ -38,7 +38,8 @@ easy to distinguish.
 - `docs/TESTING.md` — validation and play-test checklist.
 - `docs/MILESTONES.md` — current implementation milestones and roadmap.
 
-Implementation tasks T1–T6 are complete.
+Implementation tasks through T6.4 are complete, except the separately pending
+manual render-quality comparison in T6.2.
 
 ## Controls
 
@@ -56,9 +57,15 @@ Implementation tasks T1–T6 are complete.
 - `F3`: toggle performance diagnostics
 - `Escape`: toggle the pause menu
 
+The bot retrieves the single available ball, faces the player, waits briefly,
+and throws. Catch with right mouse, dodge with Q/F, or retrieve a miss and throw
+it back. Direct live throws eliminate only the other participant; bounces are
+dead. Automatic next-round progression is not implemented, so use R or Restart
+Round after a result.
+
 The pause menu releases the mouse and pauses gameplay. It includes Resume,
 Restart Round, Controls, and Quit Game; restarting closes the menu and restores
-the existing player, ball, and target without creating replacements.
+the existing player, ball, and bot without creating replacements.
 
 ## Performance diagnostics
 

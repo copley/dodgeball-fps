@@ -56,6 +56,14 @@ Complete tasks sequentially. Each implementation task should have its own branch
 	a recorded 1280×720 manual comparison confirms stable 60 FPS-class pacing,
 	depth-stable lines, clear silhouettes, and smooth motion.
 
+- [x] **T6.4 — Basic ball-playing bot**
+  - Add one reusable `CharacterBody3D` bot that retrieves the single available
+	ball, aims, throws toward the player, and repeats through the dead-ball lifecycle.
+  - Add thrower ownership, self-hit rejection, bidirectional elimination,
+	pause-safe behaviour, and clean in-place reset.
+  - Acceptance: one player, one bot, and one ball sustain ten deterministic
+	retrieve-and-throw cycles and all prior regression suites pass.
+
 - [ ] **T7 — Round reset and pilot validation**
   - Perform final prototype validation and close remaining one-ball loop gaps.
   - Acceptance: all pilot mechanics pass the final manual play-test without

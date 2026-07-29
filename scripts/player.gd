@@ -79,7 +79,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		var ball_to_throw := held_ball
 		held_ball = null
 		charge_seconds = 0.0
-		ball_to_throw.throw(-camera.global_basis.z, throw_speed)
+		ball_to_throw.throw(-camera.global_basis.z, throw_speed, Dodgeball.Thrower.HUMAN)
 
 	if event is InputEventMouseButton and event.pressed:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -243,11 +243,12 @@ func can_pick_up(ball: Dodgeball) -> bool:
 
 
 func give_ball(ball: Dodgeball) -> void:
-	if held_ball != null:
+	if held_ball != null or not ball.is_available():
 		return
-	held_ball = ball
-	charge_seconds = 0.0
 	ball.hold_at(ball_hold_position)
+	if ball.state == Dodgeball.BallState.HELD:
+		held_ball = ball
+		charge_seconds = 0.0
 
 
 func start_catch_window() -> void:

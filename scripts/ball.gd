@@ -6,6 +6,7 @@ signal thrown(speed: float)
 signal caught
 signal valid_hit(target: DodgeballTarget)
 signal valid_player_hit(player: PlayerController)
+signal valid_bot_hit(bot: BotController)
 signal reset
 
 enum BallState {
@@ -14,6 +15,12 @@ enum BallState {
 	THROWN,
 	DEAD,
 	CAUGHT,
+}
+
+enum Thrower {
+	NONE,
+	HUMAN,
+	BOT,
 }
 
 @export var reset_height: float = -5.0
@@ -26,6 +33,7 @@ var spawn_transform: Transform3D
 var hold_position: Marker3D
 var seconds_since_throw: float = 0.0
 var valid_hit_emitted_for_throw: bool = false
+var current_thrower: int = Thrower.NONE
 
 const PHYSICAL_COLLISION_LAYER: int = 4
 const PHYSICAL_COLLISION_MASK: int = 11
@@ -48,6 +56,7 @@ func _physics_process(delta: float) -> void:
 				and (sleeping or linear_velocity.length() <= pickup_speed_threshold)
 			):
 				state = BallState.AVAILABLE
+				current_thrower = Thrower.NONE
 		if (
 			global_position.y < reset_height
 			or absf(global_position.x) > reset_horizontal_distance
@@ -63,11 +72,13 @@ func _on_sleeping_state_changed() -> void:
 		and seconds_since_throw >= pickup_grace_seconds
 	):
 		state = BallState.AVAILABLE
+		current_thrower = Thrower.NONE
 
 
 func _on_body_entered(body: Node) -> void:
 	if state == BallState.THROWN and body.is_in_group("dead_ball_surface"):
 		state = BallState.DEAD
+		current_thrower = Thrower.NONE
 		return
 	if (
 		state != BallState.THROWN
@@ -78,11 +89,18 @@ func _on_body_entered(body: Node) -> void:
 	if body is DodgeballTarget:
 		valid_hit_emitted_for_throw = true
 		state = BallState.DEAD
+		current_thrower = Thrower.NONE
 		valid_hit.emit(body as DodgeballTarget)
-	elif body is PlayerController:
+	elif body is PlayerController and current_thrower != Thrower.HUMAN:
 		valid_hit_emitted_for_throw = true
 		state = BallState.DEAD
+		current_thrower = Thrower.NONE
 		valid_player_hit.emit(body as PlayerController)
+	elif body is BotController and current_thrower != Thrower.BOT:
+		valid_hit_emitted_for_throw = true
+		state = BallState.DEAD
+		current_thrower = Thrower.NONE
+		valid_bot_hit.emit(body as BotController)
 
 
 func is_available() -> bool:
@@ -101,6 +119,7 @@ func hold_at(marker: Marker3D) -> void:
 	if not is_available():
 		return
 	state = BallState.HELD
+	current_thrower = Thrower.NONE
 	hold_position = marker
 	global_transform = marker.global_transform
 	reset_physics_interpolation()
@@ -118,6 +137,7 @@ func catch_at(marker: Marker3D) -> bool:
 	if state != BallState.THROWN:
 		return false
 	state = BallState.CAUGHT
+	current_thrower = Thrower.NONE
 	hold_position = marker
 	seconds_since_throw = 0.0
 	freeze = true
@@ -133,13 +153,14 @@ func catch_at(marker: Marker3D) -> bool:
 	return true
 
 
-func throw(direction: Vector3, speed: float) -> void:
+func throw(direction: Vector3, speed: float, thrower: int = Thrower.NONE) -> void:
 	if state != BallState.HELD:
 		return
 	global_transform = hold_position.global_transform
 	reset_physics_interpolation()
 	hold_position = null
 	state = BallState.THROWN
+	current_thrower = thrower
 	seconds_since_throw = 0.0
 	valid_hit_emitted_for_throw = false
 	collision_layer = PHYSICAL_COLLISION_LAYER
@@ -157,6 +178,7 @@ func reset_to(new_spawn_transform: Transform3D) -> void:
 	state = BallState.AVAILABLE
 	seconds_since_throw = 0.0
 	valid_hit_emitted_for_throw = false
+	current_thrower = Thrower.NONE
 	freeze = true
 	sleeping = false
 	collision_layer = PHYSICAL_COLLISION_LAYER

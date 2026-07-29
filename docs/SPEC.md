@@ -22,10 +22,14 @@ Deliver a playable Godot 4 proof of concept demonstrating first-person dodgeball
 - One grey-box indoor court.
 - One player spawn.
 - One ball spawn.
-- One stationary target or deliberately simple opponent.
+- One deliberately simple ball-playing bot at `TargetSpawn`.
+- The bot retrieves only the single `AVAILABLE` ball with collision-safe
+  `CharacterBody3D` movement, aims after a short configurable delay, throws
+  toward the human, and repeats when that same ball becomes available.
 - A newly released throw is live until its first collision with the floor,
   ceiling, a wall, or a valid participant.
-- A direct live-ball hit eliminates the target or player exactly once and makes
+- A direct live-ball hit from the other participant eliminates the bot or player
+  exactly once and makes
   the ball dead.
 - A dead ball remains physical and may bounce or roll, but cannot eliminate or
   be caught. After the pickup grace period, a sleeping or sufficiently slow
@@ -59,7 +63,7 @@ Deliver a playable Godot 4 proof of concept demonstrating first-person dodgeball
 - Dodge is orientation-relative, collision-safe, and cooldown-limited, with
   minimal HUD feedback while unavailable.
 - Restart restores the existing player to `PlayerSpawn`, ball to `BallSpawn` in
-  `AVAILABLE`, and target to `TargetSpawn` active. It clears movement, camera
+  `AVAILABLE`, and bot to `TargetSpawn` active. It clears movement, camera
   pitch, crouch, dodge, catch, elimination, and feedback state without creating
   replacement entities.
 - Escape is handled before gameplay input. The pause overlay releases the mouse,
@@ -71,6 +75,16 @@ Deliver a playable Godot 4 proof of concept demonstrating first-person dodgeball
 - Physics interpolation smooths rendered transforms between fixed physics
   updates. A diagnostic overlay may report FPS, frame time, physics time, draw
   calls, and rendered objects without changing gameplay or court presentation.
+
+## Bot and throw ownership
+
+- Bot states are explicit and mutually exclusive: `SEEK_BALL`, `MOVE_TO_BALL`,
+  `HOLD_BALL`, `AIM`, `THROW`, `WAIT_FOR_BALL`, and `ELIMINATED`.
+- Movement speed, acceleration, pickup range, aim delay, throw speed, recovery
+  delay, target height offset, and deterministic aim error are configurable.
+- Each live throw records `HUMAN` or `BOT`; a throw cannot eliminate its owner.
+- Pickup, catch, dead-ball transition, availability, and reset clear thrower identity.
+- Bot elimination stops all bot behaviour. Player elimination stops bot active play.
 
 ## Acceptance criteria
 
@@ -86,12 +100,14 @@ Deliver a playable Godot 4 proof of concept demonstrating first-person dodgeball
 	live thrown ball.
 9. A successful catch transfers the incoming ball to the player.
 10. Dodging produces a short lateral displacement and cannot be spammed continuously.
-11. Reset restores player, ball, target, and round state.
+11. Reset restores player, ball, bot, and round state.
 12. Sprint, grounded jump, and obstruction-safe crouch preserve collision and
 	diagonal movement behavior.
 13. Pausing stops gameplay and prevents mouse or keyboard actions from passing
 	through the overlay.
-14. Five consecutive restarts leave exactly one player, one ball, and one target.
+14. Five consecutive restarts leave exactly one player, one ball, and one bot.
+15. Ten bot retrieve-and-throw cycles complete without duplicate balls, lost
+	ownership, stuck states, or duplicate throws.
 
 ## Explicit exclusions
 

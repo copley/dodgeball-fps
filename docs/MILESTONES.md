@@ -45,7 +45,7 @@ Do not add:
 | M5 | Complete player controls, lateral dodge, restart, and pause menu | Complete |
 | M5.1 | Physics interpolation and performance diagnostics | Complete |
 | M5.2 | Render quality and visual smoothness | Validation pending |
-| M6 | Basic ball-playing bot | Planned |
+| M6 | Basic ball-playing bot | Complete |
 | M7 | Complete elimination and reset loop | Planned |
 | M8 | Prototype validation and stop decision | Planned |
 
@@ -56,6 +56,9 @@ pickup, charged throwing, target elimination, and timed catching are complete.
 The basic painted-court visual pass and basic pause/controls menu are also
 complete. Direct live hits now become dead after emitting once, and floor,
 ceiling, or wall contact makes the physical ball dead until it slows or sleeps.
+The target's runtime role is now filled by one basic ball-playing bot that
+repeatedly retrieves and throws the same ball. Deterministic tests cover
+throw ownership, elimination, pause, reset, and ten consecutive exchange cycles.
 
 ## M5.1 — Performance smoothing and diagnostics
 
