@@ -17,6 +17,22 @@ corner_radius_top_right = 1
 corner_radius_bottom_right = 1
 corner_radius_bottom_left = 1
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause"]
+bg_color = Color(0.08, 0.13, 0.2, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.086, 0.56, 0.827, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 28.0
+content_margin_top = 24.0
+content_margin_right = 28.0
+content_margin_bottom = 24.0
+
 [node name="Main" type="Node3D"]
 script = ExtResource("2_main")
 
@@ -89,3 +105,109 @@ theme_override_colors/font_color = Color(0.2, 1, 0.55, 1)
 theme_override_font_sizes/font_size = 24
 text = "CATCH WINDOW"
 horizontal_alignment = 1
+
+[node name="DodgeFeedback" type="Label" parent="UI"]
+visible = false
+offset_left = 0.0
+offset_top = 148.0
+offset_right = 1280.0
+offset_bottom = 180.0
+theme_override_colors/font_color = Color(0.91, 0.294, 0.372, 1)
+theme_override_font_sizes/font_size = 20
+text = "DODGE RECHARGING"
+horizontal_alignment = 1
+
+[node name="PerformanceDiagnostics" type="Label" parent="UI"]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 248.0
+offset_bottom = 144.0
+theme_override_colors/font_color = Color(0.957, 0.945, 0.91, 1)
+theme_override_colors/font_shadow_color = Color(0.08, 0.13, 0.2, 0.9)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 16
+text = "PERFORMANCE"
+
+[node name="PauseOverlay" type="ColorRect" parent="UI"]
+visible = false
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.06, 0.09, 0.72)
+
+[node name="PausePanel" type="VBoxContainer" parent="UI/PauseOverlay"]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -170.0
+offset_top = -190.0
+offset_right = 170.0
+offset_bottom = 190.0
+theme_override_constants/separation = 14
+theme_override_styles/panel = SubResource("StyleBoxFlat_pause")
+
+[node name="Title" type="Label" parent="UI/PauseOverlay/PausePanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.957, 0.945, 0.91, 1)
+theme_override_font_sizes/font_size = 34
+text = "PAUSED"
+horizontal_alignment = 1
+
+[node name="Resume" type="Button" parent="UI/PauseOverlay/PausePanel"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+text = "Resume"
+
+[node name="RestartRound" type="Button" parent="UI/PauseOverlay/PausePanel"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+text = "Restart Round"
+
+[node name="Controls" type="Button" parent="UI/PauseOverlay/PausePanel"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+text = "Controls"
+
+[node name="QuitGame" type="Button" parent="UI/PauseOverlay/PausePanel"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+text = "Quit Game"
+
+[node name="ControlsPanel" type="VBoxContainer" parent="UI/PauseOverlay"]
+visible = false
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -230.0
+offset_top = -280.0
+offset_right = 230.0
+offset_bottom = 280.0
+theme_override_constants/separation = 10
+theme_override_styles/panel = SubResource("StyleBoxFlat_pause")
+
+[node name="Title" type="Label" parent="UI/PauseOverlay/ControlsPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.957, 0.945, 0.91, 1)
+theme_override_font_sizes/font_size = 30
+text = "CONTROLS"
+horizontal_alignment = 1
+
+[node name="Bindings" type="Label" parent="UI/PauseOverlay/ControlsPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.957, 0.945, 0.91, 1)
+theme_override_font_sizes/font_size = 19
+text = "WASD — Move\nMouse — Aim / Look\nShift — Sprint\nCtrl — Crouch\nSpace — Jump\nLeft Mouse — Charge / Throw\nRight Mouse — Timed Catch\nE — Pick Up / Interact\nQ — Dodge Left\nF — Dodge Right\nR — Restart Round\nF3 — Performance Overlay\nEscape — Pause Menu"
+
+[node name="Back" type="Button" parent="UI/PauseOverlay/ControlsPanel"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+text = "Back"

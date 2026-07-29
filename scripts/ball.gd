@@ -92,6 +92,8 @@ func hold_at(marker: Marker3D) -> void:
 		return
 	state = BallState.HELD
 	hold_position = marker
+	global_transform = marker.global_transform
+	reset_physics_interpolation()
 	seconds_since_throw = 0.0
 	freeze = true
 	sleeping = false
@@ -117,6 +119,7 @@ func catch_at(marker: Marker3D) -> bool:
 	caught.emit()
 	state = BallState.HELD
 	global_transform = marker.global_transform
+	reset_physics_interpolation()
 	return true
 
 
@@ -124,6 +127,7 @@ func throw(direction: Vector3, speed: float) -> void:
 	if state != BallState.HELD:
 		return
 	global_transform = hold_position.global_transform
+	reset_physics_interpolation()
 	hold_position = null
 	state = BallState.THROWN
 	seconds_since_throw = 0.0
@@ -148,6 +152,7 @@ func reset_to(new_spawn_transform: Transform3D) -> void:
 	collision_layer = PHYSICAL_COLLISION_LAYER
 	collision_mask = PHYSICAL_COLLISION_MASK
 	global_transform = spawn_transform
+	reset_physics_interpolation()
 	linear_velocity = Vector3.ZERO
 	angular_velocity = Vector3.ZERO
 	freeze = false

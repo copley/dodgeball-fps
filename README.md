@@ -16,7 +16,10 @@ Prove the core loop:
 
 ## Scope
 
-The pilot uses one stylized indoor court, one player, one ball, and one stationary target or simple bot. It excludes multiplayer, polished art, progression, complex AI, menus, and production release work.
+The pilot uses one stylized indoor court, one player, one ball, and one stationary
+target or simple bot. It excludes multiplayer, polished art, progression,
+complex AI, complex menus, and production release work. A basic pause overlay
+provides resume, clean round restart, controls, and quit actions.
 
 ## Visual style
 
@@ -35,13 +38,38 @@ easy to distinguish.
 - `docs/TESTING.md` — validation and play-test checklist.
 - `docs/MILESTONES.md` — current implementation milestones and roadmap.
 
-Implementation tasks T1–T5 are complete.
+Implementation tasks T1–T6 are complete.
 
 ## Controls
 
 - `WASD`: move
-- Mouse: look
-- `E`: pick up an available ball
+- Mouse: aim/look
+- `Shift`: hold to sprint
+- `Ctrl`: hold to crouch
+- `Space`: jump
 - Left mouse: hold to charge, release to throw
-- Right mouse: open the catch window
-- `Esc`: release the mouse cursor
+- Right mouse: timed catch
+- `E`: pick up/interact
+- `Q`: dodge left
+- `F`: dodge right
+- `R`: restart the current round
+- `F3`: toggle performance diagnostics
+- `Escape`: toggle the pause menu
+
+The pause menu releases the mouse and pauses gameplay. It includes Resume,
+Restart Round, Controls, and Quit Game; restarting closes the menu and restores
+the existing player, ball, and target without creating replacements.
+
+## Performance diagnostics
+
+Physics interpolation is enabled to smooth visual motion between fixed physics
+updates. An F3 overlay shows FPS, current, rolling-average, and short-window
+maximum frame time, physics-processing time, draw calls, and rendered object
+count. It updates four times per second. Use a release/editor play session to
+identify the limiting area before reducing visual quality:
+
+- Low FPS with high frame time suggests rendering or general frame load.
+- High physics time suggests collision or gameplay processing.
+- High draw calls or object count suggests scene/render batching work.
+- Stable metrics with visibly uneven movement suggests frame pacing, display
+  synchronization, or hardware/driver configuration rather than court design.

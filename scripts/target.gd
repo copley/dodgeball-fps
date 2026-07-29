@@ -7,6 +7,11 @@ signal eliminated
 @onready var collision_shape: CollisionShape3D = $CollisionShape3D
 
 var is_eliminated: bool = false
+var active_material: Material
+
+
+func _ready() -> void:
+	active_material = mesh.material_override
 
 
 func eliminate() -> void:
@@ -16,6 +21,14 @@ func eliminate() -> void:
 	collision_shape.set_deferred("disabled", true)
 	mesh.material_override = _create_eliminated_material()
 	eliminated.emit()
+
+
+func reset_to(new_spawn_transform: Transform3D) -> void:
+	global_transform = new_spawn_transform
+	reset_physics_interpolation()
+	is_eliminated = false
+	collision_shape.set_deferred("disabled", false)
+	mesh.material_override = active_material
 
 
 func _create_eliminated_material() -> StandardMaterial3D:

@@ -42,16 +42,84 @@ Do not add:
 | M3 | Valid hit and dead-ball handling | In progress |
 | M4 | Timed catching and possession transfer | Complete |
 | M4.5 | Basic painted court graphics | Complete |
-| M5 | Lateral dodge with cooldown | Planned |
+| M5 | Complete player controls, lateral dodge, restart, and pause menu | Complete |
+| M5.1 | Physics interpolation and performance diagnostics | Complete |
+| M5.2 | Render quality and visual smoothness | Validation pending |
 | M6 | Basic ball-playing bot | Planned |
 | M7 | Complete elimination and reset loop | Planned |
 | M8 | Prototype validation and stop decision | Planned |
 
 ## Current implementation checkpoint
 
-Movement, pickup, charged throwing, target elimination, and timed catching are
-complete. The basic painted-court visual pass is also complete. Dead-ball
-handling after floor, wall, or ceiling contact is still incomplete.
+Movement, sprint, grounded jump, safe crouch, lateral dodge, clean restart,
+pickup, charged throwing, target elimination, and timed catching are complete.
+The basic painted-court visual pass and basic pause/controls menu are also
+complete. Dead-ball handling after floor, wall, or ceiling contact is still
+incomplete.
+
+## M5.1 — Performance smoothing and diagnostics
+
+### Deliverables
+
+- Global physics interpolation for smoother rendered motion.
+- Teleport-safe interpolation resets for the player, ball, and target.
+- Toggleable F3 diagnostics for FPS, frame time, physics time, draw calls, and
+  rendered objects.
+
+### Exit criteria
+
+- Round restart does not interpolate entities from their previous positions.
+- Diagnostics identify the likely performance category without changing court
+  visuals or gameplay values.
+- Existing gameplay and court regression suites still pass.
+
+## M5.2 — Render quality and visual smoothness
+
+### Baseline
+
+The original test-machine baseline at 1280×720 was approximately 60 FPS,
+16.1–16.7 ms frame time, 0.7–0.9 ms physics time, 65–84 draw calls, and
+228–250 rendered objects.
+
+### Selected configuration
+
+- Retain Forward+ and native 100% 3D render scale.
+- Use 2× MSAA as the single 3D anti-aliasing method. Screen-space
+  anti-aliasing remains disabled.
+- Enable VSync for sensible pacing on a 60 Hz display.
+- Preserve the original environment and single real-time shadow-casting
+  directional light.
+- Preserve the court's unshaded painted materials for reliable indoor
+  readability. SSAO, SSIL, SSR, glow, volumetric fog, motion blur, dynamic
+  resolution, and FSR remain off.
+- Keep floor, wall, marking, ball, and target materials non-metallic with
+  painted-surface roughness. Use a brighter orange ball and warm-white target
+  for separation across the blue, red, and green floor zones.
+- Keep visual-only court markings collision-free. Boundary marking centres sit
+  at 0.035 m, leaving at least 0.007 m between their lower faces and the top of
+  the painted floor-zone meshes.
+- Reset ball interpolation whenever pickup, catch, or throw changes its
+  transform so interpolation never uses a stale pre-transition transform.
+
+### Interactive 2× versus 4× MSAA comparison
+
+1. Run the project at 1280×720 with F3 visible and play ordinary movement,
+   jumps, crouches, dodges, pickups, and throws for at least one minute.
+2. Record FPS, average and maximum frame time, physics time, draw calls, and
+   objects with `rendering/anti_aliasing/quality/msaa_3d=1` (2×).
+3. Exit, change that setting to `2` (4×) in Project Settings, repeat the same
+   route and actions, and compare court-line and silhouette edges.
+4. Restore `1` unless 4× holds approximately 60 FPS, an average near 16.7 ms,
+   and no persistent ordinary-play spikes on the Quadro M4000.
+
+### Exit criteria
+
+- Automated render-quality invariants and all gameplay regression suites pass.
+- Manual 1280×720 comparison confirms smoother edges, depth-stable markings,
+  readable ball/target/crosshair, smooth motion and resets, and baseline-class
+  frame pacing.
+- Keep this milestone validation pending until that manual comparison is
+  recorded.
 
 ## M4.5 — Basic painted court graphics
 
@@ -139,7 +207,7 @@ handling after floor, wall, or ceiling contact is still incomplete.
 - One incoming ball cannot be caught twice.
 - Catch success never creates another ball.
 
-## M5 — Lateral dodge with cooldown
+## M5 — Player controls, lateral dodge, restart, and pause menu
 
 ### Deliverables
 
@@ -149,12 +217,20 @@ handling after floor, wall, or ceiling contact is still incomplete.
 - Dodge respects court collision and boundaries.
 - Normal movement resumes immediately after the dodge.
 - Minimal feedback communicates when dodge is unavailable.
+- Shift sprint, grounded Space jump, and hold-Ctrl safe crouch complete the
+  keyboard/mouse movement layout.
+- R cleanly restores the existing player, ball, and target.
+- Escape pauses gameplay and opens Resume, Restart Round, Controls, and Quit
+  Game actions while releasing the mouse.
 
 ### Exit criteria
 
 - Dodging can avoid a valid incoming throw.
 - The player cannot pass through court geometry.
 - Repeated dodge attempts cannot bypass the cooldown.
+- Five consecutive keyboard or menu resets retain exactly one player, one ball,
+  and one target.
+- Gameplay physics and inputs do not run through the pause overlay.
 
 ## M6 — Basic ball-playing bot
 
