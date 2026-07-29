@@ -3,6 +3,7 @@ extends RigidBody3D
 
 signal picked_up
 signal thrown(speed: float)
+signal valid_hit(target: DodgeballTarget)
 signal reset
 
 enum BallState {
@@ -20,13 +21,15 @@ var state: int = BallState.AVAILABLE
 var spawn_transform: Transform3D
 var hold_position: Marker3D
 var seconds_since_throw: float = 0.0
+var valid_hit_emitted_for_throw: bool = false
 
 const PHYSICAL_COLLISION_LAYER: int = 4
-const PHYSICAL_COLLISION_MASK: int = 1
+const PHYSICAL_COLLISION_MASK: int = 9
 
 
 func _ready() -> void:
 	sleeping_state_changed.connect(_on_sleeping_state_changed)
+	body_entered.connect(_on_body_entered)
 
 
 func _physics_process(delta: float) -> void:
@@ -57,6 +60,18 @@ func _on_sleeping_state_changed() -> void:
 		state = BallState.AVAILABLE
 
 
+func _on_body_entered(body: Node) -> void:
+	if (
+		state != BallState.THROWN
+		or valid_hit_emitted_for_throw
+		or linear_velocity.length() <= pickup_speed_threshold
+		or not body is DodgeballTarget
+	):
+		return
+	valid_hit_emitted_for_throw = true
+	valid_hit.emit(body as DodgeballTarget)
+
+
 func is_available() -> bool:
 	return state == BallState.AVAILABLE
 
@@ -83,6 +98,7 @@ func throw(direction: Vector3, speed: float) -> void:
 	hold_position = null
 	state = BallState.THROWN
 	seconds_since_throw = 0.0
+	valid_hit_emitted_for_throw = false
 	collision_layer = PHYSICAL_COLLISION_LAYER
 	collision_mask = PHYSICAL_COLLISION_MASK
 	freeze = false
@@ -97,6 +113,7 @@ func reset_to(new_spawn_transform: Transform3D) -> void:
 	hold_position = null
 	state = BallState.AVAILABLE
 	seconds_since_throw = 0.0
+	valid_hit_emitted_for_throw = false
 	freeze = true
 	sleeping = false
 	collision_layer = PHYSICAL_COLLISION_LAYER

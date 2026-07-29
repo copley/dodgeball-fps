@@ -14,7 +14,7 @@ Complete tasks sequentially. Each implementation task should have its own branch
   - Implement one-ball possession, pickup range, charge duration, release velocity, and reset behaviour.
   - Acceptance: quick and full-charge throws are visibly different and use physical collisions.
 
-- [ ] **T4 — Target hit and elimination**
+- [x] **T4 — Target hit and elimination**
   - Add a stationary target or deliberately simple opponent and valid-hit processing.
   - Acceptance: a thrown ball eliminates exactly once and exposes round result state.
 
