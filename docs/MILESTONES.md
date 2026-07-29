@@ -1,5 +1,9 @@
 # One-Ball Prototype Milestones
 
+This file preserves prototype implementation history and status. The
+conditional product sequence is in [ROADMAP.md](ROADMAP.md), and the M8
+interactive evidence procedure is in [PLAYTESTING.md](PLAYTESTING.md).
+
 ## Product goal
 
 Build a first-person dodgeball game in Godot with:
@@ -331,3 +335,7 @@ After this milestone, stop development and make an explicit decision based on pl
 3. Approve a separately scoped expansion.
 
 Do not expand the project automatically.
+
+Use [playtests/TEMPLATE.md](playtests/TEMPLATE.md) to record the ten-round
+session. Until that evidence exists, M8 remains planned; M5.2 likewise remains
+pending until its manual render comparison is recorded.

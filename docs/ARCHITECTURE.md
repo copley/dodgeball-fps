@@ -1,5 +1,12 @@
 # Architecture
 
+## Authority
+
+This document is authoritative for the implemented prototype architecture.
+[FUTURE_ARCHITECTURE.md](FUTURE_ARCHITECTURE.md) describes a conditional
+multi-participant target; its controllers, rulesets, rosters, map contract and
+networking boundary do not currently exist.
+
 ## Intended structure
 
 ```text

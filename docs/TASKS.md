@@ -73,6 +73,12 @@ Complete tasks sequentially. Each implementation task should have its own branch
 	elimination events. Required manual M7 checks are recorded in
 	`docs/TESTING.md`.
 
+- [x] **Documentation — Product vision, rules, future architecture and validation**
+  - Record clearly separated implemented-prototype, target Version 1.0 and
+	long-term layers without changing or approving gameplay implementation.
+  - Acceptance: documentation ownership is explicit, relative links and
+	Mermaid fences validate, and no gameplay, scene, test or project file changes.
+
 ## Stop condition
 
 Proceed only to M8 prototype validation and stop decision. Any extra feature
