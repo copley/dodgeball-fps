@@ -1,7 +1,6 @@
 # Dodgeball FPS
 
-A playable Godot 4 prototype for a first-person dodgeball game, built as a
-six-hour pilot.
+A playable Godot 4 prototype for a first-person dodgeball game, built as a six-hour pilot.
 
 ## Pilot goal
 
@@ -29,3 +28,12 @@ The pilot uses one grey-box court, one player, one ball, and one stationary targ
 - `docs/MILESTONES.md` — current implementation milestones and roadmap.
 
 Implementation tasks T1–T5 are complete.
+
+## Controls
+
+- `WASD`: move
+- Mouse: look
+- `E`: pick up an available ball
+- Left mouse: hold to charge, release to throw
+- Right mouse: open the catch window
+- `Esc`: release the mouse cursor
