@@ -40,6 +40,14 @@ move_right={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"physical_keycode":68)]
 }
+pickup_ball={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"physical_keycode":69)]
+}
+throw_ball={
+"deadzone": 0.5,
+"events": [Object(InputEventMouseButton,"button_index":1)]
+}
 
 [physics]
 
