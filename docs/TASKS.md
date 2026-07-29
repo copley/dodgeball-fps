@@ -6,7 +6,7 @@ Complete tasks sequentially. Each implementation task should have its own branch
   - Create `project.godot`, main scene, court geometry, collision, spawn markers, and basic crosshair.
   - Acceptance: project opens directly into a bounded court without parse errors.
 
-- [ ] **T2 — First-person movement and mouse look**
+- [x] **T2 — First-person movement and mouse look**
   - Implement WASD movement, gravity, mouse capture, and stable camera look.
   - Acceptance: player can traverse the court predictably and cannot pass through boundaries.
 
