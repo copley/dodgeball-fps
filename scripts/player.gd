@@ -43,6 +43,7 @@ var is_crouching: bool = false
 var dodge_seconds_remaining: float = 0.0
 var dodge_cooldown_remaining: float = 0.0
 var dodge_direction: Vector3 = Vector3.ZERO
+var gameplay_enabled: bool = true
 
 const STANDING_CAMERA_HEIGHT: float = 1.6
 
@@ -53,7 +54,7 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if get_tree().paused or is_eliminated:
+	if get_tree().paused or not gameplay_enabled or is_eliminated:
 		return
 
 	if event.is_action_pressed("pickup_ball") and held_ball == null:
@@ -98,6 +99,9 @@ func _apply_mouse_look(relative_motion: Vector2) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if not gameplay_enabled:
+		velocity = Vector3.ZERO
+		return
 	if catch_seconds_remaining > 0.0:
 		catch_requested.emit(self)
 		catch_seconds_remaining = maxf(catch_seconds_remaining - delta, 0.0)
@@ -158,7 +162,7 @@ func get_movement_speed(wants_sprint: bool) -> float:
 
 
 func try_jump() -> bool:
-	if is_eliminated or is_crouching or not is_on_floor() or velocity.y > 0.0:
+	if not gameplay_enabled or is_eliminated or is_crouching or not is_on_floor() or velocity.y > 0.0:
 		return false
 	velocity.y = jump_velocity
 	return true
@@ -167,6 +171,7 @@ func try_jump() -> bool:
 func start_dodge(side: float) -> bool:
 	if (
 		get_tree().paused
+		or not gameplay_enabled
 		or is_eliminated
 		or dodge_seconds_remaining > 0.0
 		or dodge_cooldown_remaining > 0.0
@@ -217,6 +222,7 @@ func reset_to(new_spawn_transform: Transform3D) -> void:
 	charge_seconds = 0.0
 	catch_seconds_remaining = 0.0
 	is_eliminated = false
+	gameplay_enabled = true
 	is_crouching = false
 	dodge_seconds_remaining = 0.0
 	dodge_cooldown_remaining = 0.0
@@ -236,6 +242,7 @@ func reset_to(new_spawn_transform: Transform3D) -> void:
 func can_pick_up(ball: Dodgeball) -> bool:
 	return (
 		not is_eliminated
+		and gameplay_enabled
 		and held_ball == null
 		and ball.is_available()
 		and global_position.distance_to(ball.global_position) <= pickup_range
@@ -243,7 +250,7 @@ func can_pick_up(ball: Dodgeball) -> bool:
 
 
 func give_ball(ball: Dodgeball) -> void:
-	if held_ball != null or not ball.is_available():
+	if not gameplay_enabled or held_ball != null or not ball.is_available():
 		return
 	ball.hold_at(ball_hold_position)
 	if ball.state == Dodgeball.BallState.HELD:
@@ -252,7 +259,7 @@ func give_ball(ball: Dodgeball) -> void:
 
 
 func start_catch_window() -> void:
-	if is_eliminated or held_ball != null or catch_seconds_remaining > 0.0:
+	if not gameplay_enabled or is_eliminated or held_ball != null or catch_seconds_remaining > 0.0:
 		return
 	catch_seconds_remaining = catch_duration
 	catch_window_changed.emit(true)
@@ -265,6 +272,7 @@ func is_catch_window_active() -> bool:
 func can_catch(ball: Dodgeball) -> bool:
 	if (
 		is_eliminated
+		or not gameplay_enabled
 		or held_ball != null
 		or not is_catch_window_active()
 		or not ball.is_thrown()
@@ -296,9 +304,21 @@ func catch_ball(ball: Dodgeball) -> bool:
 
 
 func eliminate() -> void:
-	if is_eliminated:
+	if not gameplay_enabled or is_eliminated:
 		return
 	is_eliminated = true
 	catch_seconds_remaining = 0.0
 	catch_window_changed.emit(false)
 	eliminated.emit()
+
+
+func set_gameplay_enabled(enabled: bool) -> void:
+	gameplay_enabled = enabled
+	if enabled:
+		return
+	held_ball = null
+	charge_seconds = 0.0
+	catch_seconds_remaining = 0.0
+	dodge_seconds_remaining = 0.0
+	velocity = Vector3.ZERO
+	catch_window_changed.emit(false)

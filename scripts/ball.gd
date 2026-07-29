@@ -34,6 +34,7 @@ var hold_position: Marker3D
 var seconds_since_throw: float = 0.0
 var valid_hit_emitted_for_throw: bool = false
 var current_thrower: int = Thrower.NONE
+var gameplay_enabled: bool = true
 
 const PHYSICAL_COLLISION_LAYER: int = 4
 const PHYSICAL_COLLISION_MASK: int = 11
@@ -45,6 +46,8 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if not gameplay_enabled:
+		return
 	if state == BallState.HELD and is_instance_valid(hold_position):
 		global_transform = hold_position.global_transform
 	else:
@@ -76,6 +79,8 @@ func _on_sleeping_state_changed() -> void:
 
 
 func _on_body_entered(body: Node) -> void:
+	if not gameplay_enabled:
+		return
 	if state == BallState.THROWN and body.is_in_group("dead_ball_surface"):
 		state = BallState.DEAD
 		current_thrower = Thrower.NONE
@@ -116,7 +121,7 @@ func is_dead() -> bool:
 
 
 func hold_at(marker: Marker3D) -> void:
-	if not is_available():
+	if not gameplay_enabled or not is_available():
 		return
 	state = BallState.HELD
 	current_thrower = Thrower.NONE
@@ -134,7 +139,7 @@ func hold_at(marker: Marker3D) -> void:
 
 
 func catch_at(marker: Marker3D) -> bool:
-	if state != BallState.THROWN:
+	if not gameplay_enabled or state != BallState.THROWN:
 		return false
 	state = BallState.CAUGHT
 	current_thrower = Thrower.NONE
@@ -154,7 +159,7 @@ func catch_at(marker: Marker3D) -> bool:
 
 
 func throw(direction: Vector3, speed: float, thrower: int = Thrower.NONE) -> void:
-	if state != BallState.HELD:
+	if not gameplay_enabled or state != BallState.HELD:
 		return
 	global_transform = hold_position.global_transform
 	reset_physics_interpolation()
@@ -179,6 +184,7 @@ func reset_to(new_spawn_transform: Transform3D) -> void:
 	seconds_since_throw = 0.0
 	valid_hit_emitted_for_throw = false
 	current_thrower = Thrower.NONE
+	gameplay_enabled = true
 	freeze = true
 	sleeping = false
 	collision_layer = PHYSICAL_COLLISION_LAYER
@@ -189,3 +195,15 @@ func reset_to(new_spawn_transform: Transform3D) -> void:
 	angular_velocity = Vector3.ZERO
 	freeze = false
 	reset.emit()
+
+
+func neutralize() -> void:
+	gameplay_enabled = false
+	hold_position = null
+	state = BallState.DEAD
+	current_thrower = Thrower.NONE
+	valid_hit_emitted_for_throw = true
+	seconds_since_throw = 0.0
+	linear_velocity = Vector3.ZERO
+	angular_velocity = Vector3.ZERO
+	freeze = true

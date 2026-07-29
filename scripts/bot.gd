@@ -34,6 +34,7 @@ var held_ball: Dodgeball
 var state_seconds_remaining: float = 0.0
 var is_eliminated: bool = false
 var is_active: bool = true
+var gameplay_enabled: bool = true
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var active_material: Material
 
@@ -48,7 +49,7 @@ func configure(game_ball: Dodgeball, human_player: PlayerController) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if not is_active or is_eliminated:
+	if not gameplay_enabled or not is_active or is_eliminated:
 		velocity = Vector3.ZERO
 		return
 	if not is_on_floor():
@@ -114,6 +115,7 @@ func _move_to_ball(delta: float) -> void:
 func try_pick_up_ball() -> bool:
 	if (
 		not is_active
+		or not gameplay_enabled
 		or is_eliminated
 		or held_ball != null
 		or not is_instance_valid(ball)
@@ -181,9 +183,21 @@ func reset_to(new_spawn_transform: Transform3D) -> void:
 	state_seconds_remaining = 0.0
 	is_eliminated = false
 	is_active = true
+	gameplay_enabled = true
 	state = BotState.SEEK_BALL
 	mesh.material_override = active_material
 	_face_player()
+
+
+func set_gameplay_enabled(enabled: bool) -> void:
+	gameplay_enabled = enabled
+	if enabled:
+		is_active = not is_eliminated
+		return
+	is_active = false
+	held_ball = null
+	state_seconds_remaining = 0.0
+	velocity = Vector3.ZERO
 
 
 func _create_eliminated_material() -> StandardMaterial3D:

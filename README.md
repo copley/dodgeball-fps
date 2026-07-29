@@ -1,6 +1,6 @@
 # Dodgeball FPS
 
-A playable Godot 4 prototype for a first-person dodgeball game, built as a six-hour pilot.
+A playable Godot 4 vertical slice for a first-person dodgeball game.
 
 ## Pilot goal
 
@@ -12,7 +12,7 @@ Prove the core loop:
 4. Exchange the same ball with a computer-controlled opponent.
 5. Catch an incoming ball during a short timing window.
 6. Dodge laterally.
-7. Reset the round.
+7. Resolve an elimination and automatically start the next round.
 
 ## Scope
 
@@ -38,8 +38,10 @@ easy to distinguish.
 - `docs/TESTING.md` — validation and play-test checklist.
 - `docs/MILESTONES.md` — current implementation milestones and roadmap.
 
-Implementation tasks through T6.4 are complete, except the separately pending
-manual render-quality comparison in T6.2.
+Implementation through M7 is complete, including the live/dead-ball lifecycle,
+basic bot exchange loop, and automatic round resolution/reset. Final prototype
+validation (M8) and the separately pending manual render-quality comparison
+(M5.2) remain.
 
 ## Controls
 
@@ -59,13 +61,22 @@ manual render-quality comparison in T6.2.
 
 The bot retrieves the single available ball, faces the player, waits briefly,
 and throws. Catch with right mouse, dodge with Q/F, or retrieve a miss and throw
-it back. Direct live throws eliminate only the other participant; bounces are
-dead. Automatic next-round progression is not implemented, so use R or Restart
-Round after a result.
+it back. Only a direct live throw can eliminate the other participant; the
+first court-surface collision makes a throw dead, so later bounces cannot
+eliminate or be caught. A valid elimination displays `PLAYER WINS` or `BOT
+WINS`, locks gameplay for two seconds, then resets the existing player, bot,
+and ball in place and begins the next round automatically.
 
 The pause menu releases the mouse and pauses gameplay. It includes Resume,
 Restart Round, Controls, and Quit Game; restarting closes the menu and restores
 the existing player, ball, and bot without creating replacements.
+
+## Known limitations
+
+The bot uses deterministic retrieve, aim, and throw behaviour and does not catch
+or dodge. There is no scoring, rounds-to-win system, match timer, multiplayer,
+controller support, or progression. Final interactive prototype validation and
+the M5.2 render-quality comparison are still pending.
 
 ## Performance diagnostics
 

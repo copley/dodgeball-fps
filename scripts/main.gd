@@ -1,5 +1,21 @@
 extends Node3D
 
+signal round_ended(winner: int)
+signal round_reset
+
+enum RoundState {
+	STARTING,
+	ACTIVE,
+	RESOLVING,
+	RESETTING,
+}
+
+enum RoundWinner {
+	NONE,
+	PLAYER,
+	BOT,
+}
+
 const PLAYER_SCENE: PackedScene = preload("res://scenes/player.tscn")
 const BALL_SCENE: PackedScene = preload("res://scenes/ball.tscn")
 const BOT_SCENE: PackedScene = preload("res://scenes/bot.tscn")
@@ -14,7 +30,9 @@ const BOT_SCENE: PackedScene = preload("res://scenes/bot.tscn")
 @onready var pause_overlay: Control = $UI/PauseOverlay
 @onready var pause_panel: VBoxContainer = $UI/PauseOverlay/PausePanel
 @onready var controls_panel: VBoxContainer = $UI/PauseOverlay/ControlsPanel
+@onready var round_reset_timer: Timer = $RoundResetTimer
 
+@export var inter_round_delay: float = 2.0
 var player: PlayerController
 var ball: Dodgeball
 var bot: BotController
@@ -22,6 +40,10 @@ var bot_eliminated: bool = false
 var gameplay_mouse_captured: bool = true
 var diagnostics_seconds_until_update: float = 0.0
 var frame_time_samples: Array[float] = []
+var round_state: int = RoundState.STARTING
+var accepted_winner: int = RoundWinner.NONE
+var reset_serial: int = 0
+var automatic_reset_count: int = 0
 
 const DIAGNOSTICS_UPDATE_INTERVAL: float = 0.25
 const DIAGNOSTICS_ROLLING_SAMPLE_COUNT: int = 120
@@ -50,12 +72,14 @@ func _ready() -> void:
 	bot.configure(ball, player)
 	bot.reset_to(target_spawn.global_transform)
 	bot.eliminated.connect(_on_bot_eliminated)
+	round_reset_timer.timeout.connect(_on_round_reset_timeout)
 	$UI/PauseOverlay/PausePanel/Resume.pressed.connect(close_pause_menu)
 	$UI/PauseOverlay/PausePanel/RestartRound.pressed.connect(_on_menu_restart)
 	$UI/PauseOverlay/PausePanel/Controls.pressed.connect(_show_controls)
 	$UI/PauseOverlay/PausePanel/QuitGame.pressed.connect(get_tree().quit)
 	$UI/PauseOverlay/ControlsPanel/Back.pressed.connect(_show_pause_options)
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	round_state = RoundState.ACTIVE
 	_update_performance_diagnostics()
 
 
@@ -150,54 +174,88 @@ func _on_menu_restart() -> void:
 
 
 func restart_round() -> void:
+	reset_serial += 1
+	round_reset_timer.stop()
+	_perform_round_reset()
+
+
+func _perform_round_reset() -> void:
+	round_state = RoundState.RESETTING
 	player.reset_to(player_spawn.global_transform)
 	ball.reset_to(ball_spawn.global_transform)
 	bot.reset_to(target_spawn.global_transform)
 	bot_eliminated = false
+	accepted_winner = RoundWinner.NONE
 	round_result_label.visible = false
 	round_result_label.text = ""
 	catch_feedback_label.visible = false
 	catch_feedback_label.text = ""
 	dodge_feedback_label.visible = false
+	round_state = RoundState.ACTIVE
+	round_reset.emit()
 
 
 func _on_dodge_availability_changed(available: bool) -> void:
 	dodge_feedback_label.visible = not available
 
 func _on_pickup_requested(player: PlayerController) -> void:
-	if player.can_pick_up(ball):
+	if round_state == RoundState.ACTIVE and player.can_pick_up(ball):
 		player.give_ball(ball)
 
 
 func _on_catch_requested(catching_player: PlayerController) -> void:
-	catching_player.catch_ball(ball)
+	if round_state == RoundState.ACTIVE:
+		catching_player.catch_ball(ball)
 
 
 func _on_ball_valid_hit(hit_target: DodgeballTarget) -> void:
-	if is_instance_valid(hit_target):
+	if round_state == RoundState.ACTIVE and is_instance_valid(hit_target):
 		hit_target.eliminate()
 
 
 func _on_ball_valid_player_hit(hit_player: PlayerController) -> void:
-	if hit_player == player:
+	if round_state == RoundState.ACTIVE and hit_player == player:
 		player.eliminate()
 
 func _on_ball_valid_bot_hit(hit_bot: BotController) -> void:
-	if hit_bot == bot:
+	if round_state == RoundState.ACTIVE and hit_bot == bot:
 		bot.eliminate()
 
 func _on_bot_eliminated() -> void:
-	if bot_eliminated:
+	if round_state != RoundState.ACTIVE or bot_eliminated:
 		return
 	bot_eliminated = true
-	round_result_label.text = "BOT ELIMINATED"
-	round_result_label.visible = true
+	_accept_round_result(RoundWinner.PLAYER)
 
 
 func _on_player_eliminated() -> void:
-	bot.stop_play()
-	round_result_label.text = "PLAYER ELIMINATED"
+	if round_state != RoundState.ACTIVE:
+		return
+	_accept_round_result(RoundWinner.BOT)
+
+
+func _accept_round_result(winner: int) -> void:
+	if round_state != RoundState.ACTIVE or accepted_winner != RoundWinner.NONE:
+		return
+	round_state = RoundState.RESOLVING
+	accepted_winner = winner
+	round_result_label.text = "PLAYER WINS" if winner == RoundWinner.PLAYER else "BOT WINS"
 	round_result_label.visible = true
+	catch_feedback_label.visible = false
+	catch_feedback_label.text = ""
+	dodge_feedback_label.visible = false
+	player.set_gameplay_enabled(false)
+	bot.set_gameplay_enabled(false)
+	ball.neutralize()
+	round_reset_timer.start(inter_round_delay)
+	round_ended.emit(winner)
+
+
+func _on_round_reset_timeout() -> void:
+	if round_state != RoundState.RESOLVING:
+		return
+	automatic_reset_count += 1
+	_perform_round_reset()
 
 
 func _on_catch_window_changed(active: bool) -> void:
@@ -206,8 +264,11 @@ func _on_catch_window_changed(active: bool) -> void:
 
 
 func _on_catch_succeeded() -> void:
+	if round_state != RoundState.ACTIVE:
+		return
+	var feedback_serial := reset_serial
 	catch_feedback_label.text = "CAUGHT!"
 	catch_feedback_label.visible = true
 	await get_tree().create_timer(0.75).timeout
-	if not player.is_catch_window_active():
+	if feedback_serial == reset_serial and not player.is_catch_window_active():
 		catch_feedback_label.visible = false
