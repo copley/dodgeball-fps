@@ -16,7 +16,15 @@ Prove the core loop:
 
 ## Scope
 
-The pilot uses one grey-box court, one player, one ball, and one stationary target or simple bot. It excludes multiplayer, polished art, progression, complex AI, menus, and production release work.
+The pilot uses one stylized indoor court, one player, one ball, and one stationary target or simple bot. It excludes multiplayer, polished art, progression, complex AI, menus, and production release work.
+
+## Visual style
+
+The court uses a clean painted-gym palette: bright blue for the player half,
+coral red for the opponent half, court green for the centre strip and perimeter,
+and warm-white lines. Dove-grey walls, dark-navy lower trim, a light-grey
+ceiling, and charcoal accents keep the ball, target, crosshair, and boundaries
+easy to distinguish.
 
 ## Project controls
 

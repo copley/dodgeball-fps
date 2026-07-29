@@ -22,6 +22,10 @@ Complete tasks sequentially. Each implementation task should have its own branch
   - Add a bounded catch window and successful possession transfer.
   - Acceptance: correctly timed catches prevent elimination; early and late attempts fail.
 
+- [x] **T5.5 — Basic court graphics pass**
+  - Add a stylized painted court, visual-only markings, gym wall treatment, and a readable indoor palette.
+  - Acceptance: court colours and markings are visible, collision and spawn transforms are unchanged, and T1–T5 validation still passes.
+
 - [ ] **T6 — Lateral dodge and cooldown**
   - Add short left/right displacement with cooldown and boundary-safe movement.
   - Acceptance: dodge is responsive but cannot be continuously spammed.
