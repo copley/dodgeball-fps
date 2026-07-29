@@ -53,8 +53,22 @@ Implementation tasks T1–T6 are complete.
 - `Q`: dodge left
 - `F`: dodge right
 - `R`: restart the current round
+- `F3`: toggle performance diagnostics
 - `Escape`: toggle the pause menu
 
 The pause menu releases the mouse and pauses gameplay. It includes Resume,
 Restart Round, Controls, and Quit Game; restarting closes the menu and restores
 the existing player, ball, and target without creating replacements.
+
+## Performance diagnostics
+
+Physics interpolation is enabled to smooth visual motion between fixed physics
+updates. An F3 overlay shows FPS, frame-processing time, physics-processing
+time, draw calls, and rendered object count. Use a release/editor play session
+to identify the limiting area before reducing visual quality:
+
+- Low FPS with high frame time suggests rendering or general frame load.
+- High physics time suggests collision or gameplay processing.
+- High draw calls or object count suggests scene/render batching work.
+- Stable metrics with visibly uneven movement suggests frame pacing, display
+  synchronization, or hardware/driver configuration rather than court design.

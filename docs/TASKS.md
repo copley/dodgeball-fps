@@ -35,6 +35,12 @@ Complete tasks sequentially. Each implementation task should have its own branch
 	but cannot be spammed; pause blocks gameplay; five restarts retain exactly
 	one player, one ball, and one target.
 
+- [x] **T6.1 — Performance smoothing and diagnostics**
+  - Enable physics interpolation with teleport-safe resets and add an F3 overlay
+	for FPS, frame time, physics time, draw calls, and rendered objects.
+  - Acceptance: visual transform interpolation is enabled, diagnostics can be
+	toggled, and court design and gameplay values remain unchanged.
+
 - [ ] **T7 — Round reset and pilot validation**
   - Perform final prototype validation and close remaining one-ball loop gaps.
   - Acceptance: all pilot mechanics pass the final manual play-test without

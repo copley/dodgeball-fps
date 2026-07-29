@@ -80,10 +80,15 @@ pause_menu={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"physical_keycode":4194305)]
 }
+toggle_performance={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"physical_keycode":4194334)]
+}
 
 [physics]
 
 3d/physics_engine="Jolt Physics"
+common/physics_interpolation=true
 
 [rendering]
 

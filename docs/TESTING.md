@@ -37,6 +37,9 @@ Any parser error, missing resource, invalid node path, or non-zero exit status b
 - [ ] Resume recaptures the mouse; menu Restart Round resets and resumes.
 - [ ] Reset restores one player, one ball, and one target.
 - [ ] Five consecutive resets create no duplicate entities or events.
+- [ ] Movement and ball motion appear smooth with physics interpolation enabled.
+- [ ] F3 toggles FPS, frame time, physics time, draw-call, and object diagnostics.
+- [ ] Restarted entities do not visibly interpolate from their previous position.
 
 ## Evidence expected in pull requests
 

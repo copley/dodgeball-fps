@@ -42,7 +42,7 @@ dodgeball-fps/
 - `Ball`: physical motion, ownership state, collision reporting, pickup eligibility, and reset.
 - `Target`: receives valid hits and reports elimination.
 - `UI`: crosshair, minimal catch/dodge/result indicators, and the basic
-  pause/controls overlay.
+  pause/controls overlay. It also owns a read-only F3 performance label.
 
 ## Communication
 
@@ -62,6 +62,12 @@ their reset methods. It must not instantiate replacements or reconnect signals.
 `Main` also handles Escape and R before ordinary player input. Its process mode,
 and the pause overlay's process mode, remain active while the `SceneTree` is
 paused; gameplay nodes retain normal processing and therefore stop.
+
+Global physics interpolation smooths visual transforms between physics ticks.
+Entity reset methods call `reset_physics_interpolation()` after teleporting so
+a round restart does not render a sweep from the old transform. `Main` samples
+read-only `Performance` monitors four times per second for the F3 overlay; the
+diagnostics do not modify simulation values or select quality settings.
 
 ## State boundaries
 

@@ -40,6 +40,7 @@ Deliver a playable Godot 4 proof of concept demonstrating first-person dodgeball
 - `Q`: dodge left
 - `F`: dodge right
 - `R`: restart the current round
+- `F3`: toggle performance diagnostics
 - `Escape`: toggle the pause menu
 
 ## Movement, restart, and pause
@@ -61,6 +62,9 @@ Deliver a playable Godot 4 proof of concept demonstrating first-person dodgeball
 - The pause menu offers Resume, Restart Round, Controls, and Quit Game. Controls
   lists the fixed keyboard/mouse bindings and Back returns to the main panel.
   Menu restart performs the clean reset, resumes, and recaptures the mouse.
+- Physics interpolation smooths rendered transforms between fixed physics
+  updates. A diagnostic overlay may report FPS, frame time, physics time, draw
+  calls, and rendered objects without changing gameplay or court presentation.
 
 ## Acceptance criteria
 

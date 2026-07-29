@@ -43,6 +43,7 @@ Do not add:
 | M4 | Timed catching and possession transfer | Complete |
 | M4.5 | Basic painted court graphics | Complete |
 | M5 | Complete player controls, lateral dodge, restart, and pause menu | Complete |
+| M5.1 | Physics interpolation and performance diagnostics | Complete |
 | M6 | Basic ball-playing bot | Planned |
 | M7 | Complete elimination and reset loop | Planned |
 | M8 | Prototype validation and stop decision | Planned |
@@ -54,6 +55,22 @@ pickup, charged throwing, target elimination, and timed catching are complete.
 The basic painted-court visual pass and basic pause/controls menu are also
 complete. Dead-ball handling after floor, wall, or ceiling contact is still
 incomplete.
+
+## M5.1 — Performance smoothing and diagnostics
+
+### Deliverables
+
+- Global physics interpolation for smoother rendered motion.
+- Teleport-safe interpolation resets for the player, ball, and target.
+- Toggleable F3 diagnostics for FPS, frame time, physics time, draw calls, and
+  rendered objects.
+
+### Exit criteria
+
+- Round restart does not interpolate entities from their previous positions.
+- Diagnostics identify the likely performance category without changing court
+  visuals or gameplay values.
+- Existing gameplay and court regression suites still pass.
 
 ## M4.5 — Basic painted court graphics
 

@@ -223,6 +223,7 @@ func reset_to(new_spawn_transform: Transform3D) -> void:
 	dodge_direction = Vector3.ZERO
 	velocity = Vector3.ZERO
 	global_transform = new_spawn_transform
+	reset_physics_interpolation()
 	camera.rotation = Vector3.ZERO
 	camera.position.y = STANDING_CAMERA_HEIGHT
 	var capsule := collision_shape.shape as CapsuleShape3D

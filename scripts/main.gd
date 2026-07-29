@@ -10,6 +10,7 @@ const TARGET_SCENE: PackedScene = preload("res://scenes/target.tscn")
 @onready var round_result_label: Label = $UI/RoundResult
 @onready var catch_feedback_label: Label = $UI/CatchFeedback
 @onready var dodge_feedback_label: Label = $UI/DodgeFeedback
+@onready var performance_diagnostics_label: Label = $UI/PerformanceDiagnostics
 @onready var pause_overlay: Control = $UI/PauseOverlay
 @onready var pause_panel: VBoxContainer = $UI/PauseOverlay/PausePanel
 @onready var controls_panel: VBoxContainer = $UI/PauseOverlay/ControlsPanel
@@ -19,12 +20,15 @@ var ball: Dodgeball
 var target: DodgeballTarget
 var target_eliminated: bool = false
 var gameplay_mouse_captured: bool = true
+var diagnostics_seconds_until_update: float = 0.0
+
+const DIAGNOSTICS_UPDATE_INTERVAL: float = 0.25
 
 
 func _ready() -> void:
 	player = PLAYER_SCENE.instantiate()
 	add_child(player)
-	player.global_transform = player_spawn.global_transform
+	player.reset_to(player_spawn.global_transform)
 	player.pickup_requested.connect(_on_pickup_requested)
 	player.catch_requested.connect(_on_catch_requested)
 	player.catch_window_changed.connect(_on_catch_window_changed)
@@ -40,7 +44,7 @@ func _ready() -> void:
 
 	target = TARGET_SCENE.instantiate()
 	add_child(target)
-	target.global_transform = target_spawn.global_transform
+	target.reset_to(target_spawn.global_transform)
 	target.eliminated.connect(_on_target_eliminated)
 	$UI/PauseOverlay/PausePanel/Resume.pressed.connect(close_pause_menu)
 	$UI/PauseOverlay/PausePanel/RestartRound.pressed.connect(_on_menu_restart)
@@ -48,9 +52,14 @@ func _ready() -> void:
 	$UI/PauseOverlay/PausePanel/QuitGame.pressed.connect(get_tree().quit)
 	$UI/PauseOverlay/ControlsPanel/Back.pressed.connect(_show_pause_options)
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	_update_performance_diagnostics()
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("toggle_performance"):
+		performance_diagnostics_label.visible = not performance_diagnostics_label.visible
+		get_viewport().set_input_as_handled()
+		return
 	if event.is_action_pressed("pause_menu"):
 		if get_tree().paused:
 			close_pause_menu()
@@ -61,6 +70,26 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not get_tree().paused and event.is_action_pressed("restart_round"):
 		restart_round()
 		get_viewport().set_input_as_handled()
+
+
+func _process(delta: float) -> void:
+	diagnostics_seconds_until_update -= delta
+	if diagnostics_seconds_until_update <= 0.0:
+		_update_performance_diagnostics()
+		diagnostics_seconds_until_update = DIAGNOSTICS_UPDATE_INTERVAL
+
+
+func _update_performance_diagnostics() -> void:
+	performance_diagnostics_label.text = (
+		"FPS: %d\nFrame: %.2f ms\nPhysics: %.2f ms\nDraw calls: %d\nObjects: %d"
+		% [
+			Engine.get_frames_per_second(),
+			Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0,
+			Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0,
+			int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)),
+			int(Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME)),
+		]
+	)
 
 
 func open_pause_menu() -> void:

@@ -25,6 +25,7 @@ func eliminate() -> void:
 
 func reset_to(new_spawn_transform: Transform3D) -> void:
 	global_transform = new_spawn_transform
+	reset_physics_interpolation()
 	is_eliminated = false
 	collision_shape.set_deferred("disabled", false)
 	mesh.material_override = active_material

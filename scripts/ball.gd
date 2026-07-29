@@ -148,6 +148,7 @@ func reset_to(new_spawn_transform: Transform3D) -> void:
 	collision_layer = PHYSICAL_COLLISION_LAYER
 	collision_mask = PHYSICAL_COLLISION_MASK
 	global_transform = spawn_transform
+	reset_physics_interpolation()
 	linear_velocity = Vector3.ZERO
 	angular_velocity = Vector3.ZERO
 	freeze = false
