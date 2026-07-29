@@ -39,7 +39,7 @@ Do not add:
 | --- | --- | --- |
 | M1 | Playable first-person court | Complete |
 | M2 | One-ball pickup and throwing | Complete |
-| M3 | Valid hit and dead-ball handling | In progress |
+| M3 | Valid hit and dead-ball handling | Complete |
 | M4 | Timed catching and possession transfer | Complete |
 | M4.5 | Basic painted court graphics | Complete |
 | M5 | Complete player controls, lateral dodge, restart, and pause menu | Complete |
@@ -54,8 +54,8 @@ Do not add:
 Movement, sprint, grounded jump, safe crouch, lateral dodge, clean restart,
 pickup, charged throwing, target elimination, and timed catching are complete.
 The basic painted-court visual pass and basic pause/controls menu are also
-complete. Dead-ball handling after floor, wall, or ceiling contact is still
-incomplete.
+complete. Direct live hits now become dead after emitting once, and floor,
+ceiling, or wall contact makes the physical ball dead until it slows or sleeps.
 
 ## M5.1 — Performance smoothing and diagnostics
 

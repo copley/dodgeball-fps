@@ -41,6 +41,14 @@ Complete tasks sequentially. Each implementation task should have its own branch
   - Acceptance: visual transform interpolation is enabled, diagnostics can be
 	toggled, and court design and gameplay values remain unchanged.
 
+- [x] **T6.3 — Live and dead ball handling**
+  - Add explicit live/dead ball transitions, identify every physical court
+	surface through the `dead_ball_surface` group, and prevent post-bounce hits
+	or catches while preserving physical settling and re-pickup.
+  - Acceptance: direct live hits emit exactly once; floor, ceiling, and all four
+	walls make the ball dead; dead balls cannot eliminate or be caught; slow or
+	sleeping dead balls become available; reset and all gameplay regressions pass.
+
 - [ ] **T6.2 — Render quality and visual smoothness**
   - Configure low-cost anti-aliasing and frame pacing, improve court depth and
 	material readability, and extend F3 with rolling frame-time diagnostics.

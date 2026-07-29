@@ -75,9 +75,19 @@ diagnostics do not modify simulation values or select quality settings.
 Ball state should be explicit and mutually exclusive:
 
 ```text
-AVAILABLE -> HELD -> THROWN -> AVAILABLE
-					-> CAUGHT -> HELD
+AVAILABLE -> HELD -> THROWN -> DEAD -> AVAILABLE
+                    -> CAUGHT -> HELD
 ```
+
+`THROWN` is the only live-ball state. A direct valid participant hit emits one
+valid-hit signal and immediately transitions to `DEAD`. Catching is permitted
+only from `THROWN`; `CAUGHT` is the explicit transfer transition before `HELD`.
+The floor, ceiling, left wall, right wall, near wall, and far wall belong to the
+`dead_ball_surface` group. First contact between a live ball and any member of
+that group transitions the ball to `DEAD` without relying on node names.
+`DEAD` balls remain unfrozen rigid bodies until the existing grace period has
+elapsed and they are sleeping or below the pickup-speed threshold, at which
+point they become `AVAILABLE`.
 
 Player state remains lightweight:
 
