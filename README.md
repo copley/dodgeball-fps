@@ -35,8 +35,16 @@ easy to distinguish.
 - `docs/SPEC.md` — required behaviour and acceptance criteria.
 - `docs/ARCHITECTURE.md` — intended Godot structure.
 - `docs/TASKS.md` — ordered implementation queue.
-- `docs/TESTING.md` — validation and play-test checklist.
-- `docs/MILESTONES.md` — current implementation milestones and roadmap.
+- `docs/TESTING.md` — automated correctness validation.
+- `docs/MILESTONES.md` — prototype implementation history and status.
+- `docs/GAME_DESIGN.md` — long-term product intent and experience.
+- `docs/GAMEPLAY_RULES.md` — current-versus-future rules and variations.
+- `docs/STATE_MACHINES.md` — implemented and future state definitions.
+- `docs/FUTURE_ARCHITECTURE.md` — conditional scalable architecture.
+- `docs/DECISIONS.md` — major product and architecture decisions.
+- `docs/ROADMAP.md` — conditional post-prototype sequence.
+- `docs/KNOWN_LIMITATIONS.md` — limitations and unresolved questions.
+- `docs/PLAYTESTING.md` — interactive validation strategy.
 
 Implementation through M7 is complete, including the live/dead-ball lifecycle,
 basic bot exchange loop, and automatic round resolution/reset. Final prototype

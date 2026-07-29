@@ -1,5 +1,11 @@
 # Testing
 
+This document owns automated correctness validation. Subjective interactive
+evaluation is defined in [PLAYTESTING.md](PLAYTESTING.md), with evidence
+recorded using [playtests/TEMPLATE.md](playtests/TEMPLATE.md). Headless success
+does not establish fun, fairness, usability, audio quality, visual quality in
+motion, M5.2 completion or M8 completion.
+
 ## Automated validation
 
 Run from the repository root after Godot project files exist:
@@ -36,6 +42,9 @@ twenty automatic completions, entity counts, clean state restoration, and the
 bot resuming retrieval and throwing.
 
 ## Manual pilot checklist
+
+These observations are interactive evidence, not automated acceptance. Use the
+play-testing guide and template when performing M8.
 
 - [ ] Project opens directly into the court.
 - [ ] Mouse capture and release behave predictably.

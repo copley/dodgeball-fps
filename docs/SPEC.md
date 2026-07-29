@@ -1,5 +1,19 @@
 # Pilot Specification
 
+## Authority and future design
+
+This document is normative only for the implemented one-human, one-bot,
+one-court, one-ball offline prototype. Future product intent, rule variations,
+states and scalable architecture are non-normative for this build:
+
+- [GAME_DESIGN.md](GAME_DESIGN.md)
+- [GAMEPLAY_RULES.md](GAMEPLAY_RULES.md)
+- [STATE_MACHINES.md](STATE_MACHINES.md)
+- [FUTURE_ARCHITECTURE.md](FUTURE_ARCHITECTURE.md)
+- [ROADMAP.md](ROADMAP.md)
+
+Nothing in those documents authorizes additional current-build features.
+
 ## Objective
 
 Deliver a playable Godot 4 proof of concept demonstrating first-person dodgeball mechanics within a six-hour implementation budget.
