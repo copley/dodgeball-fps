@@ -2,7 +2,7 @@
 
 Complete tasks sequentially. Each implementation task should have its own branch and pull request after the planning PR is merged.
 
-- [ ] **T1 — Bootstrap Godot project and grey-box court**
+- [x] **T1 — Bootstrap Godot project and grey-box court**
   - Create `project.godot`, main scene, court geometry, collision, spawn markers, and basic crosshair.
   - Acceptance: project opens directly into a bounded court without parse errors.
 

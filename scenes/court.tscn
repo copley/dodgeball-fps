@@ -1,0 +1,129 @@
+[gd_scene load_steps=14 format=3]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
+albedo_color = Color(0.28, 0.3, 0.33, 1)
+roughness = 0.85
+cull_mode = 2
+shading_mode = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wall"]
+albedo_color = Color(0.48, 0.5, 0.54, 1)
+roughness = 0.9
+cull_mode = 2
+shading_mode = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ceiling"]
+albedo_color = Color(0.38, 0.4, 0.43, 1)
+roughness = 0.9
+cull_mode = 2
+shading_mode = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_line"]
+albedo_color = Color(0.9, 0.88, 0.72, 1)
+roughness = 0.75
+shading_mode = 0
+
+[sub_resource type="BoxMesh" id="BoxMesh_floor"]
+material = SubResource("StandardMaterial3D_floor")
+size = Vector3(20, 0.5, 30)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(20, 0.5, 30)
+
+[sub_resource type="BoxMesh" id="BoxMesh_side_wall"]
+material = SubResource("StandardMaterial3D_wall")
+size = Vector3(0.5, 6, 30)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_side_wall"]
+size = Vector3(0.5, 6, 30)
+
+[sub_resource type="BoxMesh" id="BoxMesh_end_wall"]
+material = SubResource("StandardMaterial3D_wall")
+size = Vector3(20, 6, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_end_wall"]
+size = Vector3(20, 6, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ceiling"]
+material = SubResource("StandardMaterial3D_ceiling")
+size = Vector3(20, 0.5, 30)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ceiling"]
+size = Vector3(20, 0.5, 30)
+
+[sub_resource type="BoxMesh" id="BoxMesh_center_line"]
+material = SubResource("StandardMaterial3D_line")
+size = Vector3(19.5, 0.02, 0.12)
+
+[node name="Court" type="Node3D"]
+
+[node name="Geometry" type="Node3D" parent="."]
+
+[node name="Floor" type="StaticBody3D" parent="Geometry"]
+position = Vector3(0, -0.25, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/Floor"]
+mesh = SubResource("BoxMesh_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Floor"]
+shape = SubResource("BoxShape3D_floor")
+
+[node name="Ceiling" type="StaticBody3D" parent="Geometry"]
+position = Vector3(0, 6.25, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/Ceiling"]
+mesh = SubResource("BoxMesh_ceiling")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Ceiling"]
+shape = SubResource("BoxShape3D_ceiling")
+
+[node name="LeftWall" type="StaticBody3D" parent="Geometry"]
+position = Vector3(-10.25, 3, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/LeftWall"]
+mesh = SubResource("BoxMesh_side_wall")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/LeftWall"]
+shape = SubResource("BoxShape3D_side_wall")
+
+[node name="RightWall" type="StaticBody3D" parent="Geometry"]
+position = Vector3(10.25, 3, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/RightWall"]
+mesh = SubResource("BoxMesh_side_wall")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/RightWall"]
+shape = SubResource("BoxShape3D_side_wall")
+
+[node name="NearWall" type="StaticBody3D" parent="Geometry"]
+position = Vector3(0, 3, 15.25)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/NearWall"]
+mesh = SubResource("BoxMesh_end_wall")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/NearWall"]
+shape = SubResource("BoxShape3D_end_wall")
+
+[node name="FarWall" type="StaticBody3D" parent="Geometry"]
+position = Vector3(0, 3, -15.25)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/FarWall"]
+mesh = SubResource("BoxMesh_end_wall")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/FarWall"]
+shape = SubResource("BoxShape3D_end_wall")
+
+[node name="CenterLine" type="MeshInstance3D" parent="Geometry"]
+position = Vector3(0, 0.011, 0)
+mesh = SubResource("BoxMesh_center_line")
+
+[node name="SpawnMarkers" type="Node3D" parent="."]
+
+[node name="PlayerSpawn" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(0, 0, 10)
+
+[node name="BallSpawn" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(0, 0.5, 0)
+
+[node name="TargetSpawn" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(0, 0, -10)
