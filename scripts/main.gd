@@ -21,8 +21,10 @@ var target: DodgeballTarget
 var target_eliminated: bool = false
 var gameplay_mouse_captured: bool = true
 var diagnostics_seconds_until_update: float = 0.0
+var frame_time_samples: Array[float] = []
 
 const DIAGNOSTICS_UPDATE_INTERVAL: float = 0.25
+const DIAGNOSTICS_ROLLING_SAMPLE_COUNT: int = 120
 
 
 func _ready() -> void:
@@ -73,6 +75,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
+	frame_time_samples.push_back(delta * 1000.0)
+	if frame_time_samples.size() > DIAGNOSTICS_ROLLING_SAMPLE_COUNT:
+		frame_time_samples.pop_front()
 	diagnostics_seconds_until_update -= delta
 	if diagnostics_seconds_until_update <= 0.0:
 		_update_performance_diagnostics()
@@ -80,11 +85,31 @@ func _process(delta: float) -> void:
 
 
 func _update_performance_diagnostics() -> void:
+	var current_frame_time_ms: float = (
+		float(frame_time_samples.back())
+		if not frame_time_samples.is_empty()
+		else Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0
+	)
+	var average_frame_time_ms := 0.0
+	var maximum_frame_time_ms := 0.0
+	for sample: float in frame_time_samples:
+		average_frame_time_ms += sample
+		maximum_frame_time_ms = maxf(maximum_frame_time_ms, sample)
+	if frame_time_samples.is_empty():
+		average_frame_time_ms = current_frame_time_ms
+		maximum_frame_time_ms = current_frame_time_ms
+	else:
+		average_frame_time_ms /= frame_time_samples.size()
 	performance_diagnostics_label.text = (
-		"FPS: %d\nFrame: %.2f ms\nPhysics: %.2f ms\nDraw calls: %d\nObjects: %d"
+		(
+			"FPS: %d\nFrame: %.2f ms\nAverage: %.2f ms\nMaximum: %.2f ms"
+			+ "\nPhysics: %.2f ms\nDraw calls: %d\nObjects: %d"
+		)
 		% [
 			Engine.get_frames_per_second(),
-			Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0,
+			current_frame_time_ms,
+			average_frame_time_ms,
+			maximum_frame_time_ms,
 			Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0,
 			int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)),
 			int(Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME)),

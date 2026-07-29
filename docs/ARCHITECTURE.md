@@ -65,8 +65,9 @@ paused; gameplay nodes retain normal processing and therefore stop.
 
 Global physics interpolation smooths visual transforms between physics ticks.
 Entity reset methods call `reset_physics_interpolation()` after teleporting so
-a round restart does not render a sweep from the old transform. `Main` samples
-read-only `Performance` monitors four times per second for the F3 overlay; the
+a round restart does not render a sweep from the old transform. `Main` records
+render-frame deltas in a bounded 120-sample window and updates the F3 label from
+that window and read-only `Performance` monitors four times per second. The
 diagnostics do not modify simulation values or select quality settings.
 
 ## State boundaries

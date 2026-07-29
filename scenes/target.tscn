@@ -3,8 +3,9 @@
 [ext_resource type="Script" path="res://scripts/target.gd" id="1_target"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_target"]
-albedo_color = Color(0.12, 0.48, 0.9, 1)
-roughness = 0.7
+albedo_color = Color(0.956863, 0.945098, 0.909804, 1)
+metallic = 0.0
+roughness = 0.72
 
 [sub_resource type="BoxMesh" id="BoxMesh_target"]
 material = SubResource("StandardMaterial3D_target")

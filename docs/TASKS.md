@@ -41,6 +41,13 @@ Complete tasks sequentially. Each implementation task should have its own branch
   - Acceptance: visual transform interpolation is enabled, diagnostics can be
 	toggled, and court design and gameplay values remain unchanged.
 
+- [ ] **T6.2 — Render quality and visual smoothness**
+  - Configure low-cost anti-aliasing and frame pacing, improve court depth and
+	material readability, and extend F3 with rolling frame-time diagnostics.
+  - Acceptance: automated render invariants and gameplay regressions pass, and
+	a recorded 1280×720 manual comparison confirms stable 60 FPS-class pacing,
+	depth-stable lines, clear silhouettes, and smooth motion.
+
 - [ ] **T7 — Round reset and pilot validation**
   - Perform final prototype validation and close remaining one-ball loop gaps.
   - Acceptance: all pilot mechanics pass the final manual play-test without

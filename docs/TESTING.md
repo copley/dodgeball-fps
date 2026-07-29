@@ -40,6 +40,13 @@ Any parser error, missing resource, invalid node path, or non-zero exit status b
 - [ ] Movement and ball motion appear smooth with physics interpolation enabled.
 - [ ] F3 toggles FPS, frame time, physics time, draw-call, and object diagnostics.
 - [ ] Restarted entities do not visibly interpolate from their previous position.
+- [ ] At 1280×720, court lines do not shimmer or depth-flicker.
+- [ ] 2× MSAA visibly reduces jagged court and entity edges.
+- [ ] Ball, target, crosshair, and markings remain readable on every floor zone.
+- [ ] FPS remains approximately 60 and average frame time remains near 16.7 ms.
+- [ ] Ordinary play produces no persistent frame-time spikes.
+- [ ] Compare 2× MSAA (`msaa_3d=1`) with 4× (`msaa_3d=2`) using the same
+	  one-minute movement and throwing route; retain 2× unless 4× holds baseline.
 
 ## Evidence expected in pull requests
 

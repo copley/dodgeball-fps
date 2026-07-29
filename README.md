@@ -63,9 +63,10 @@ the existing player, ball, and target without creating replacements.
 ## Performance diagnostics
 
 Physics interpolation is enabled to smooth visual motion between fixed physics
-updates. An F3 overlay shows FPS, frame-processing time, physics-processing
-time, draw calls, and rendered object count. Use a release/editor play session
-to identify the limiting area before reducing visual quality:
+updates. An F3 overlay shows FPS, current, rolling-average, and short-window
+maximum frame time, physics-processing time, draw calls, and rendered object
+count. It updates four times per second. Use a release/editor play session to
+identify the limiting area before reducing visual quality:
 
 - Low FPS with high frame time suggests rendering or general frame load.
 - High physics time suggests collision or gameplay processing.

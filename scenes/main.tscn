@@ -7,8 +7,8 @@
 background_mode = 1
 background_color = Color(0.06, 0.07, 0.09, 1)
 ambient_light_source = 3
-ambient_light_color = Color(0.65, 0.7, 0.8, 1)
-ambient_light_energy = 0.55
+ambient_light_color = Color(0.72, 0.75, 0.8, 1)
+ambient_light_energy = 0.7
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_crosshair"]
 bg_color = Color(0.96, 0.96, 0.96, 0.95)
@@ -44,8 +44,9 @@ environment = SubResource("Environment_main")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 rotation_degrees = Vector3(-55, -25, 0)
 light_color = Color(0.92, 0.94, 1, 1)
-light_energy = 1.15
+light_energy = 1.0
 shadow_enabled = true
+directional_shadow_max_distance = 35.0
 
 [node name="UI" type="CanvasLayer" parent="."]
 
@@ -121,7 +122,7 @@ horizontal_alignment = 1
 offset_left = 16.0
 offset_top = 16.0
 offset_right = 248.0
-offset_bottom = 112.0
+offset_bottom = 144.0
 theme_override_colors/font_color = Color(0.957, 0.945, 0.91, 1)
 theme_override_colors/font_shadow_color = Color(0.08, 0.13, 0.2, 0.9)
 theme_override_constants/shadow_offset_x = 2

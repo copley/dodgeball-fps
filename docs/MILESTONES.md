@@ -44,6 +44,7 @@ Do not add:
 | M4.5 | Basic painted court graphics | Complete |
 | M5 | Complete player controls, lateral dodge, restart, and pause menu | Complete |
 | M5.1 | Physics interpolation and performance diagnostics | Complete |
+| M5.2 | Render quality and visual smoothness | Validation pending |
 | M6 | Basic ball-playing bot | Planned |
 | M7 | Complete elimination and reset loop | Planned |
 | M8 | Prototype validation and stop decision | Planned |
@@ -71,6 +72,53 @@ incomplete.
 - Diagnostics identify the likely performance category without changing court
   visuals or gameplay values.
 - Existing gameplay and court regression suites still pass.
+
+## M5.2 — Render quality and visual smoothness
+
+### Baseline
+
+The original test-machine baseline at 1280×720 was approximately 60 FPS,
+16.1–16.7 ms frame time, 0.7–0.9 ms physics time, 65–84 draw calls, and
+228–250 rendered objects.
+
+### Selected configuration
+
+- Retain Forward+ and native 100% 3D render scale.
+- Use 2× MSAA as the single 3D anti-aliasing method. Screen-space
+  anti-aliasing remains disabled.
+- Enable VSync for sensible pacing on a 60 Hz display.
+- Use one real-time shadow-casting directional light with a 2048-pixel
+  directional shadow map and a 35-metre shadow distance.
+- Raise ambient energy moderately for even court readability. SSAO, SSIL, SSR,
+  glow, volumetric fog, motion blur, dynamic resolution, and FSR remain off.
+- Keep floor, wall, marking, ball, and target materials non-metallic with
+  painted-surface roughness. Use a brighter orange ball and warm-white target
+  for separation across the blue, red, and green floor zones.
+- Keep visual-only court markings collision-free. Boundary marking centres sit
+  at 0.035 m, leaving at least 0.007 m between their lower faces and the top of
+  the painted floor-zone meshes.
+- Reset ball interpolation whenever pickup, catch, or throw changes its
+  transform so interpolation never uses a stale pre-transition transform.
+
+### Interactive 2× versus 4× MSAA comparison
+
+1. Run the project at 1280×720 with F3 visible and play ordinary movement,
+   jumps, crouches, dodges, pickups, and throws for at least one minute.
+2. Record FPS, average and maximum frame time, physics time, draw calls, and
+   objects with `rendering/anti_aliasing/quality/msaa_3d=1` (2×).
+3. Exit, change that setting to `2` (4×) in Project Settings, repeat the same
+   route and actions, and compare court-line and silhouette edges.
+4. Restore `1` unless 4× holds approximately 60 FPS, an average near 16.7 ms,
+   and no persistent ordinary-play spikes on the Quadro M4000.
+
+### Exit criteria
+
+- Automated render-quality invariants and all gameplay regression suites pass.
+- Manual 1280×720 comparison confirms smoother edges, depth-stable markings,
+  readable ball/target/crosshair, smooth motion and resets, and baseline-class
+  frame pacing.
+- Keep this milestone validation pending until that manual comparison is
+  recorded.
 
 ## M4.5 — Basic painted court graphics
 
