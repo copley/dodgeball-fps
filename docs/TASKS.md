@@ -18,7 +18,7 @@ Complete tasks sequentially. Each implementation task should have its own branch
   - Add a stationary target or deliberately simple opponent and valid-hit processing.
   - Acceptance: a thrown ball eliminates exactly once and exposes round result state.
 
-- [ ] **T5 — Timed catch**
+- [x] **T5 — Timed catch**
   - Add a bounded catch window and successful possession transfer.
   - Acceptance: correctly timed catches prevent elimination; early and late attempts fail.
 

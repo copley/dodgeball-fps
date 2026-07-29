@@ -48,6 +48,14 @@ throw_ball={
 "deadzone": 0.5,
 "events": [Object(InputEventMouseButton,"button_index":1)]
 }
+catch_ball={
+"deadzone": 0.5,
+"events": [Object(InputEventMouseButton,"button_index":2)]
+}
+development_launch={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"physical_keycode":84)]
+}
 
 [physics]
 

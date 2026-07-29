@@ -3,13 +3,16 @@ extends RigidBody3D
 
 signal picked_up
 signal thrown(speed: float)
+signal caught
 signal valid_hit(target: DodgeballTarget)
+signal valid_player_hit(player: PlayerController)
 signal reset
 
 enum BallState {
 	AVAILABLE,
 	HELD,
 	THROWN,
+	CAUGHT,
 }
 
 @export var reset_height: float = -5.0
@@ -24,7 +27,7 @@ var seconds_since_throw: float = 0.0
 var valid_hit_emitted_for_throw: bool = false
 
 const PHYSICAL_COLLISION_LAYER: int = 4
-const PHYSICAL_COLLISION_MASK: int = 9
+const PHYSICAL_COLLISION_MASK: int = 11
 
 
 func _ready() -> void:
@@ -65,15 +68,23 @@ func _on_body_entered(body: Node) -> void:
 		state != BallState.THROWN
 		or valid_hit_emitted_for_throw
 		or linear_velocity.length() <= pickup_speed_threshold
-		or not body is DodgeballTarget
 	):
 		return
 	valid_hit_emitted_for_throw = true
-	valid_hit.emit(body as DodgeballTarget)
+	if body is DodgeballTarget:
+		valid_hit.emit(body as DodgeballTarget)
+	elif body is PlayerController:
+		valid_player_hit.emit(body as PlayerController)
+	else:
+		valid_hit_emitted_for_throw = false
 
 
 func is_available() -> bool:
 	return state == BallState.AVAILABLE
+
+
+func is_thrown() -> bool:
+	return state == BallState.THROWN
 
 
 func hold_at(marker: Marker3D) -> void:
@@ -91,6 +102,24 @@ func hold_at(marker: Marker3D) -> void:
 	picked_up.emit()
 
 
+func catch_at(marker: Marker3D) -> bool:
+	if state != BallState.THROWN:
+		return false
+	state = BallState.CAUGHT
+	hold_position = marker
+	seconds_since_throw = 0.0
+	freeze = true
+	sleeping = false
+	collision_layer = 0
+	collision_mask = 0
+	linear_velocity = Vector3.ZERO
+	angular_velocity = Vector3.ZERO
+	caught.emit()
+	state = BallState.HELD
+	global_transform = marker.global_transform
+	return true
+
+
 func throw(direction: Vector3, speed: float) -> void:
 	if state != BallState.HELD:
 		return
@@ -106,6 +135,24 @@ func throw(direction: Vector3, speed: float) -> void:
 	linear_velocity = direction.normalized() * speed
 	angular_velocity = Vector3(4.0, 2.0, 1.0)
 	thrown.emit(speed)
+
+
+func launch_from(new_transform: Transform3D, direction: Vector3, speed: float) -> bool:
+	if state != BallState.AVAILABLE:
+		return false
+	global_transform = new_transform
+	state = BallState.THROWN
+	hold_position = null
+	seconds_since_throw = 0.0
+	valid_hit_emitted_for_throw = false
+	collision_layer = PHYSICAL_COLLISION_LAYER
+	collision_mask = PHYSICAL_COLLISION_MASK
+	freeze = false
+	sleeping = false
+	linear_velocity = direction.normalized() * speed
+	angular_velocity = Vector3(4.0, 2.0, 1.0)
+	thrown.emit(speed)
+	return true
 
 
 func reset_to(new_spawn_transform: Transform3D) -> void:

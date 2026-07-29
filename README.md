@@ -26,4 +26,14 @@ The pilot uses one grey-box court, one player, one ball, and one stationary targ
 - `docs/TASKS.md` — ordered implementation queue.
 - `docs/TESTING.md` — validation and play-test checklist.
 
-No gameplay code is included in this planning branch.
+The project currently includes the pilot through timed catching (T5).
+
+## Controls
+
+- `WASD`: move
+- Mouse: look
+- `E`: pick up an available ball
+- Left mouse: hold to charge, release to throw
+- Right mouse: open the catch window
+- `T`: launch an available ball from the target side for catch testing
+- `Esc`: release the mouse cursor
