@@ -14,6 +14,14 @@ When a runnable main scene exists:
 godot --headless --path . --quit-after 2
 ```
 
+Run every focused regression script:
+
+```bash
+for test_script in tests/*.gd; do
+	godot --headless --path . --script "$test_script"
+done
+```
+
 Any parser error, missing resource, invalid node path, or non-zero exit status blocks completion.
 
 ## Manual pilot checklist
@@ -28,6 +36,13 @@ Any parser error, missing resource, invalid node path, or non-zero exit status b
 - [ ] Quick and charged throws produce different speeds.
 - [ ] Ball collides with floor, walls, and target.
 - [ ] One valid hit produces one elimination.
+- [ ] A newly released throw is live until its first valid collision.
+- [ ] Direct live hits make the ball dead and cannot emit duplicate eliminations.
+- [ ] Floor, ceiling, left, right, near, and far wall contacts make the ball dead.
+- [ ] A bounced or otherwise dead ball can still move physically but cannot eliminate.
+- [ ] Dead and available balls cannot be caught.
+- [ ] A sleeping or slow dead ball becomes available after the pickup grace period.
+- [ ] Picking up an available ball clears velocity and the next throw is live.
 - [ ] Catch succeeds only inside the intended timing window.
 - [ ] Successful catch grants possession.
 - [ ] Dodge moves laterally and respects its cooldown.

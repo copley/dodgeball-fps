@@ -12,6 +12,7 @@ enum BallState {
 	AVAILABLE,
 	HELD,
 	THROWN,
+	DEAD,
 	CAUGHT,
 }
 
@@ -39,10 +40,11 @@ func _physics_process(delta: float) -> void:
 	if state == BallState.HELD and is_instance_valid(hold_position):
 		global_transform = hold_position.global_transform
 	else:
-		if state == BallState.THROWN:
+		if state == BallState.THROWN or state == BallState.DEAD:
 			seconds_since_throw += delta
 			if (
-				seconds_since_throw >= pickup_grace_seconds
+				state == BallState.DEAD
+				and seconds_since_throw >= pickup_grace_seconds
 				and (sleeping or linear_velocity.length() <= pickup_speed_threshold)
 			):
 				state = BallState.AVAILABLE
@@ -57,26 +59,30 @@ func _physics_process(delta: float) -> void:
 func _on_sleeping_state_changed() -> void:
 	if (
 		sleeping
-		and state == BallState.THROWN
+		and state == BallState.DEAD
 		and seconds_since_throw >= pickup_grace_seconds
 	):
 		state = BallState.AVAILABLE
 
 
 func _on_body_entered(body: Node) -> void:
+	if state == BallState.THROWN and body.is_in_group("dead_ball_surface"):
+		state = BallState.DEAD
+		return
 	if (
 		state != BallState.THROWN
 		or valid_hit_emitted_for_throw
 		or linear_velocity.length() <= pickup_speed_threshold
 	):
 		return
-	valid_hit_emitted_for_throw = true
 	if body is DodgeballTarget:
+		valid_hit_emitted_for_throw = true
+		state = BallState.DEAD
 		valid_hit.emit(body as DodgeballTarget)
 	elif body is PlayerController:
+		valid_hit_emitted_for_throw = true
+		state = BallState.DEAD
 		valid_player_hit.emit(body as PlayerController)
-	else:
-		valid_hit_emitted_for_throw = false
 
 
 func is_available() -> bool:
@@ -85,6 +91,10 @@ func is_available() -> bool:
 
 func is_thrown() -> bool:
 	return state == BallState.THROWN
+
+
+func is_dead() -> bool:
+	return state == BallState.DEAD
 
 
 func hold_at(marker: Marker3D) -> void:

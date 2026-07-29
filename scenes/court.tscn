@@ -156,7 +156,7 @@ size = Vector3(16, 0.12, 0.06)
 
 [node name="Geometry" type="Node3D" parent="." unique_id=181639896]
 
-[node name="Floor" type="StaticBody3D" parent="Geometry" unique_id=1414785488]
+[node name="Floor" type="StaticBody3D" parent="Geometry" groups=["dead_ball_surface"] unique_id=1414785488]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/Floor" unique_id=985960561]
@@ -165,7 +165,7 @@ mesh = SubResource("BoxMesh_floor")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Floor" unique_id=1134863428]
 shape = SubResource("BoxShape3D_floor")
 
-[node name="Ceiling" type="StaticBody3D" parent="Geometry" unique_id=1867484333]
+[node name="Ceiling" type="StaticBody3D" parent="Geometry" groups=["dead_ball_surface"] unique_id=1867484333]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.25, 0)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/Ceiling" unique_id=1171273559]
@@ -174,7 +174,7 @@ mesh = SubResource("BoxMesh_ceiling")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Ceiling" unique_id=1061708089]
 shape = SubResource("BoxShape3D_ceiling")
 
-[node name="LeftWall" type="StaticBody3D" parent="Geometry" unique_id=527650064]
+[node name="LeftWall" type="StaticBody3D" parent="Geometry" groups=["dead_ball_surface"] unique_id=527650064]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.25, 3, 0)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/LeftWall" unique_id=365866933]
@@ -183,7 +183,7 @@ mesh = SubResource("BoxMesh_side_wall")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/LeftWall" unique_id=352107618]
 shape = SubResource("BoxShape3D_side_wall")
 
-[node name="RightWall" type="StaticBody3D" parent="Geometry" unique_id=1261946116]
+[node name="RightWall" type="StaticBody3D" parent="Geometry" groups=["dead_ball_surface"] unique_id=1261946116]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.25, 3, 0)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/RightWall" unique_id=839282292]
@@ -192,7 +192,7 @@ mesh = SubResource("BoxMesh_side_wall")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/RightWall" unique_id=1767149096]
 shape = SubResource("BoxShape3D_side_wall")
 
-[node name="NearWall" type="StaticBody3D" parent="Geometry" unique_id=1712374825]
+[node name="NearWall" type="StaticBody3D" parent="Geometry" groups=["dead_ball_surface"] unique_id=1712374825]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 15.25)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/NearWall" unique_id=2025155907]
@@ -201,7 +201,7 @@ mesh = SubResource("BoxMesh_end_wall")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/NearWall" unique_id=1319176607]
 shape = SubResource("BoxShape3D_end_wall")
 
-[node name="FarWall" type="StaticBody3D" parent="Geometry" unique_id=3448141]
+[node name="FarWall" type="StaticBody3D" parent="Geometry" groups=["dead_ball_surface"] unique_id=3448141]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -15.25)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/FarWall" unique_id=1992425988]

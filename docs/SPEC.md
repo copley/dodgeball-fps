@@ -23,7 +23,13 @@ Deliver a playable Godot 4 proof of concept demonstrating first-person dodgeball
 - One player spawn.
 - One ball spawn.
 - One stationary target or deliberately simple opponent.
-- A valid ball hit eliminates the target or player.
+- A newly released throw is live until its first collision with the floor,
+  ceiling, a wall, or a valid participant.
+- A direct live-ball hit eliminates the target or player exactly once and makes
+  the ball dead.
+- A dead ball remains physical and may bounce or roll, but cannot eliminate or
+  be caught. After the pickup grace period, a sleeping or sufficiently slow
+  dead ball becomes available again.
 - A successful catch prevents elimination and gives possession.
 - After elimination, the round can reset to its initial state.
 
@@ -74,15 +80,18 @@ Deliver a playable Godot 4 proof of concept demonstrating first-person dodgeball
 4. Throw speed visibly changes between a quick release and a full charge.
 5. A thrown ball follows physical projectile motion and collides with court geometry.
 6. A valid hit triggers an elimination state once, without duplicate scoring.
-7. Catching succeeds only during a clearly bounded timing window.
-8. A successful catch transfers the incoming ball to the player.
-9. Dodging produces a short lateral displacement and cannot be spammed continuously.
-10. Reset restores player, ball, target, and round state.
-11. Sprint, grounded jump, and obstruction-safe crouch preserve collision and
+7. Floor, ceiling, or wall contact makes a live ball dead before any later hit,
+	and bounced or dead balls cannot eliminate.
+8. Catching succeeds only during a clearly bounded timing window and only for a
+	live thrown ball.
+9. A successful catch transfers the incoming ball to the player.
+10. Dodging produces a short lateral displacement and cannot be spammed continuously.
+11. Reset restores player, ball, target, and round state.
+12. Sprint, grounded jump, and obstruction-safe crouch preserve collision and
 	diagonal movement behavior.
-12. Pausing stops gameplay and prevents mouse or keyboard actions from passing
+13. Pausing stops gameplay and prevents mouse or keyboard actions from passing
 	through the overlay.
-13. Five consecutive restarts leave exactly one player, one ball, and one target.
+14. Five consecutive restarts leave exactly one player, one ball, and one target.
 
 ## Explicit exclusions
 
