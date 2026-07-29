@@ -1,27 +1,10 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene format=3 uid="uid://cl54ffjf0srxb"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
-albedo_color = Color(0.28, 0.3, 0.33, 1)
-roughness = 0.85
 cull_mode = 2
 shading_mode = 0
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wall"]
-albedo_color = Color(0.48, 0.5, 0.54, 1)
-roughness = 0.9
-cull_mode = 2
-shading_mode = 0
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ceiling"]
-albedo_color = Color(0.38, 0.4, 0.43, 1)
-roughness = 0.9
-cull_mode = 2
-shading_mode = 0
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_line"]
-albedo_color = Color(0.9, 0.88, 0.72, 1)
-roughness = 0.75
-shading_mode = 0
+albedo_color = Color(0.333333, 0.647059, 0.278431, 1)
+roughness = 0.82
 
 [sub_resource type="BoxMesh" id="BoxMesh_floor"]
 material = SubResource("StandardMaterial3D_floor")
@@ -29,6 +12,25 @@ size = Vector3(20, 0.5, 30)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
 size = Vector3(20, 0.5, 30)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ceiling"]
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(0.682353, 0.705882, 0.729412, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_ceiling"]
+material = SubResource("StandardMaterial3D_ceiling")
+size = Vector3(20, 0.5, 30)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ceiling"]
+size = Vector3(20, 0.5, 30)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wall"]
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(0.760784, 0.776471, 0.792157, 1)
+roughness = 0.9
 
 [sub_resource type="BoxMesh" id="BoxMesh_side_wall"]
 material = SubResource("StandardMaterial3D_wall")
@@ -44,86 +46,273 @@ size = Vector3(20, 6, 0.5)
 [sub_resource type="BoxShape3D" id="BoxShape3D_end_wall"]
 size = Vector3(20, 6, 0.5)
 
-[sub_resource type="BoxMesh" id="BoxMesh_ceiling"]
-material = SubResource("StandardMaterial3D_ceiling")
-size = Vector3(20, 0.5, 30)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_ceiling"]
-size = Vector3(20, 0.5, 30)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_line"]
+shading_mode = 0
+albedo_color = Color(0.956863, 0.945098, 0.909804, 1)
+roughness = 0.75
 
 [sub_resource type="BoxMesh" id="BoxMesh_center_line"]
 material = SubResource("StandardMaterial3D_line")
-size = Vector3(19.5, 0.02, 0.12)
+size = Vector3(18, 0.018, 0.14)
 
-[node name="Court" type="Node3D"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_player_half"]
+shading_mode = 0
+albedo_color = Color(0.086275, 0.560784, 0.827451, 1)
+roughness = 0.82
 
-[node name="Geometry" type="Node3D" parent="."]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_opponent_half"]
+shading_mode = 0
+albedo_color = Color(0.909804, 0.294118, 0.372549, 1)
+roughness = 0.82
 
-[node name="Floor" type="StaticBody3D" parent="Geometry"]
-position = Vector3(0, -0.25, 0)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_neutral"]
+shading_mode = 0
+albedo_color = Color(0.333333, 0.647059, 0.278431, 1)
+roughness = 0.82
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/Floor"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_spawn"]
+shading_mode = 0
+transparency = 1
+albedo_color = Color(0.968627, 0.956863, 0.909804, 0.68)
+roughness = 0.75
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_trim"]
+shading_mode = 0
+albedo_color = Color(0.145098, 0.215686, 0.290196, 1)
+roughness = 0.88
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_accent"]
+shading_mode = 0
+albedo_color = Color(0.188235, 0.203922, 0.231373, 1)
+roughness = 0.88
+
+[sub_resource type="BoxMesh" id="BoxMesh_half"]
+size = Vector3(17.7, 0.012, 12.35)
+
+[sub_resource type="BoxMesh" id="BoxMesh_neutral_strip"]
+material = SubResource("StandardMaterial3D_neutral")
+size = Vector3(17.7, 0.014, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_boundary_long"]
+material = SubResource("StandardMaterial3D_line")
+size = Vector3(18.4, 0.02, 0.18)
+
+[sub_resource type="BoxMesh" id="BoxMesh_boundary_short"]
+material = SubResource("StandardMaterial3D_line")
+size = Vector3(0.18, 0.02, 26.18)
+
+[sub_resource type="BoxMesh" id="BoxMesh_activation_line"]
+material = SubResource("StandardMaterial3D_line")
+size = Vector3(17.7, 0.018, 0.1)
+
+[sub_resource type="TorusMesh" id="TorusMesh_center_circle"]
+material = SubResource("StandardMaterial3D_line")
+inner_radius = 1.9
+outer_radius = 2.04
+rings = 64
+ring_segments = 8
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ball_circle"]
+material = SubResource("StandardMaterial3D_spawn")
+top_radius = 0.28
+bottom_radius = 0.28
+height = 0.014
+radial_segments = 32
+
+[sub_resource type="TorusMesh" id="TorusMesh_spawn_indicator"]
+material = SubResource("StandardMaterial3D_spawn")
+inner_radius = 0.58
+outer_radius = 0.7
+rings = 32
+ring_segments = 8
+
+[sub_resource type="BoxMesh" id="BoxMesh_side_trim"]
+material = SubResource("StandardMaterial3D_trim")
+size = Vector3(0.08, 1.05, 29.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_end_trim"]
+material = SubResource("StandardMaterial3D_trim")
+size = Vector3(19.5, 1.05, 0.08)
+
+[sub_resource type="BoxMesh" id="BoxMesh_side_panel"]
+material = SubResource("StandardMaterial3D_accent")
+size = Vector3(0.06, 0.12, 25)
+
+[sub_resource type="BoxMesh" id="BoxMesh_end_panel"]
+material = SubResource("StandardMaterial3D_accent")
+size = Vector3(16, 0.12, 0.06)
+
+[node name="Court" type="Node3D" unique_id=71392333]
+
+[node name="Geometry" type="Node3D" parent="." unique_id=181639896]
+
+[node name="Floor" type="StaticBody3D" parent="Geometry" unique_id=1414785488]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/Floor" unique_id=985960561]
 mesh = SubResource("BoxMesh_floor")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Floor"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Floor" unique_id=1134863428]
 shape = SubResource("BoxShape3D_floor")
 
-[node name="Ceiling" type="StaticBody3D" parent="Geometry"]
-position = Vector3(0, 6.25, 0)
+[node name="Ceiling" type="StaticBody3D" parent="Geometry" unique_id=1867484333]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.25, 0)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/Ceiling"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/Ceiling" unique_id=1171273559]
 mesh = SubResource("BoxMesh_ceiling")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Ceiling"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Ceiling" unique_id=1061708089]
 shape = SubResource("BoxShape3D_ceiling")
 
-[node name="LeftWall" type="StaticBody3D" parent="Geometry"]
-position = Vector3(-10.25, 3, 0)
+[node name="LeftWall" type="StaticBody3D" parent="Geometry" unique_id=527650064]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.25, 3, 0)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/LeftWall"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/LeftWall" unique_id=365866933]
 mesh = SubResource("BoxMesh_side_wall")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/LeftWall"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/LeftWall" unique_id=352107618]
 shape = SubResource("BoxShape3D_side_wall")
 
-[node name="RightWall" type="StaticBody3D" parent="Geometry"]
-position = Vector3(10.25, 3, 0)
+[node name="RightWall" type="StaticBody3D" parent="Geometry" unique_id=1261946116]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.25, 3, 0)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/RightWall"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/RightWall" unique_id=839282292]
 mesh = SubResource("BoxMesh_side_wall")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/RightWall"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/RightWall" unique_id=1767149096]
 shape = SubResource("BoxShape3D_side_wall")
 
-[node name="NearWall" type="StaticBody3D" parent="Geometry"]
-position = Vector3(0, 3, 15.25)
+[node name="NearWall" type="StaticBody3D" parent="Geometry" unique_id=1712374825]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 15.25)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/NearWall"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/NearWall" unique_id=2025155907]
 mesh = SubResource("BoxMesh_end_wall")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/NearWall"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/NearWall" unique_id=1319176607]
 shape = SubResource("BoxShape3D_end_wall")
 
-[node name="FarWall" type="StaticBody3D" parent="Geometry"]
-position = Vector3(0, 3, -15.25)
+[node name="FarWall" type="StaticBody3D" parent="Geometry" unique_id=3448141]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -15.25)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/FarWall"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Geometry/FarWall" unique_id=1992425988]
 mesh = SubResource("BoxMesh_end_wall")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/FarWall"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/FarWall" unique_id=1886565725]
 shape = SubResource("BoxShape3D_end_wall")
 
-[node name="CenterLine" type="MeshInstance3D" parent="Geometry"]
-position = Vector3(0, 0.011, 0)
+[node name="CenterLine" type="MeshInstance3D" parent="Geometry" unique_id=1302558839]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, 0)
 mesh = SubResource("BoxMesh_center_line")
 
-[node name="SpawnMarkers" type="Node3D" parent="."]
+[node name="CourtGraphics" type="Node3D" parent="."]
 
-[node name="PlayerSpawn" type="Marker3D" parent="SpawnMarkers"]
-position = Vector3(0, 0, 10)
+[node name="PlayerHalf" type="MeshInstance3D" parent="CourtGraphics"]
+position = Vector3(0, 0.012, 6.675)
+mesh = SubResource("BoxMesh_half")
+material_override = SubResource("StandardMaterial3D_player_half")
 
-[node name="BallSpawn" type="Marker3D" parent="SpawnMarkers"]
-position = Vector3(0, 0.5, 0)
+[node name="OpponentHalf" type="MeshInstance3D" parent="CourtGraphics"]
+position = Vector3(0, 0.012, -6.675)
+mesh = SubResource("BoxMesh_half")
+material_override = SubResource("StandardMaterial3D_opponent_half")
 
-[node name="TargetSpawn" type="Marker3D" parent="SpawnMarkers"]
-position = Vector3(0, 0, -10)
+[node name="NeutralStrip" type="MeshInstance3D" parent="CourtGraphics"]
+position = Vector3(0, 0.014, 0)
+mesh = SubResource("BoxMesh_neutral_strip")
+
+[node name="NearBoundary" type="MeshInstance3D" parent="CourtGraphics"]
+position = Vector3(0, 0.03, 13)
+mesh = SubResource("BoxMesh_boundary_long")
+
+[node name="FarBoundary" type="MeshInstance3D" parent="CourtGraphics"]
+position = Vector3(0, 0.03, -13)
+mesh = SubResource("BoxMesh_boundary_long")
+
+[node name="LeftBoundary" type="MeshInstance3D" parent="CourtGraphics"]
+position = Vector3(-9.1, 0.03, 0)
+mesh = SubResource("BoxMesh_boundary_short")
+
+[node name="RightBoundary" type="MeshInstance3D" parent="CourtGraphics"]
+position = Vector3(9.1, 0.03, 0)
+mesh = SubResource("BoxMesh_boundary_short")
+
+[node name="PlayerActivationLine" type="MeshInstance3D" parent="CourtGraphics"]
+position = Vector3(0, 0.033, 5)
+mesh = SubResource("BoxMesh_activation_line")
+
+[node name="OpponentActivationLine" type="MeshInstance3D" parent="CourtGraphics"]
+position = Vector3(0, 0.033, -5)
+mesh = SubResource("BoxMesh_activation_line")
+
+[node name="CenterCircle" type="MeshInstance3D" parent="CourtGraphics"]
+position = Vector3(0, 0.04, 0)
+mesh = SubResource("TorusMesh_center_circle")
+
+[node name="LeftBallPosition" type="MeshInstance3D" parent="CourtGraphics"]
+position = Vector3(-3, 0.043, 0)
+mesh = SubResource("CylinderMesh_ball_circle")
+
+[node name="CentreBallPosition" type="MeshInstance3D" parent="CourtGraphics"]
+position = Vector3(0, 0.043, 0)
+mesh = SubResource("CylinderMesh_ball_circle")
+
+[node name="RightBallPosition" type="MeshInstance3D" parent="CourtGraphics"]
+position = Vector3(3, 0.043, 0)
+mesh = SubResource("CylinderMesh_ball_circle")
+
+[node name="PlayerSpawnIndicator" type="MeshInstance3D" parent="CourtGraphics"]
+position = Vector3(0, 0.045, 10)
+mesh = SubResource("TorusMesh_spawn_indicator")
+
+[node name="BallSpawnIndicator" type="MeshInstance3D" parent="CourtGraphics"]
+position = Vector3(0, 0.046, 0)
+mesh = SubResource("TorusMesh_spawn_indicator")
+
+[node name="TargetSpawnIndicator" type="MeshInstance3D" parent="CourtGraphics"]
+position = Vector3(0, 0.045, -10)
+mesh = SubResource("TorusMesh_spawn_indicator")
+
+[node name="WallGraphics" type="Node3D" parent="."]
+
+[node name="LeftLowerTrim" type="MeshInstance3D" parent="WallGraphics"]
+position = Vector3(-9.97, 0.525, 0)
+mesh = SubResource("BoxMesh_side_trim")
+
+[node name="RightLowerTrim" type="MeshInstance3D" parent="WallGraphics"]
+position = Vector3(9.97, 0.525, 0)
+mesh = SubResource("BoxMesh_side_trim")
+
+[node name="NearLowerTrim" type="MeshInstance3D" parent="WallGraphics"]
+position = Vector3(0, 0.525, 14.97)
+mesh = SubResource("BoxMesh_end_trim")
+
+[node name="FarLowerTrim" type="MeshInstance3D" parent="WallGraphics"]
+position = Vector3(0, 0.525, -14.97)
+mesh = SubResource("BoxMesh_end_trim")
+
+[node name="LeftUpperPanel" type="MeshInstance3D" parent="WallGraphics"]
+position = Vector3(-9.96, 3.65, 0)
+mesh = SubResource("BoxMesh_side_panel")
+
+[node name="RightUpperPanel" type="MeshInstance3D" parent="WallGraphics"]
+position = Vector3(9.96, 3.65, 0)
+mesh = SubResource("BoxMesh_side_panel")
+
+[node name="NearUpperPanel" type="MeshInstance3D" parent="WallGraphics"]
+position = Vector3(0, 3.65, 14.96)
+mesh = SubResource("BoxMesh_end_panel")
+
+[node name="FarUpperPanel" type="MeshInstance3D" parent="WallGraphics"]
+position = Vector3(0, 3.65, -14.96)
+mesh = SubResource("BoxMesh_end_panel")
+
+[node name="SpawnMarkers" type="Node3D" parent="." unique_id=580210442]
+
+[node name="PlayerSpawn" type="Marker3D" parent="SpawnMarkers" unique_id=1767015078]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+
+[node name="BallSpawn" type="Marker3D" parent="SpawnMarkers" unique_id=1811492697]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="TargetSpawn" type="Marker3D" parent="SpawnMarkers" unique_id=1495677240]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)

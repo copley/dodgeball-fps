@@ -41,6 +41,7 @@ Do not add:
 | M2 | One-ball pickup and throwing | Complete |
 | M3 | Valid hit and dead-ball handling | In progress |
 | M4 | Timed catching and possession transfer | Complete |
+| M4.5 | Basic painted court graphics | Complete |
 | M5 | Lateral dodge with cooldown | Planned |
 | M6 | Basic ball-playing bot | Planned |
 | M7 | Complete elimination and reset loop | Planned |
@@ -49,8 +50,23 @@ Do not add:
 ## Current implementation checkpoint
 
 Movement, pickup, charged throwing, target elimination, and timed catching are
-complete. Dead-ball handling after floor, wall, or ceiling contact is still
-incomplete.
+complete. The basic painted-court visual pass is also complete. Dead-ball
+handling after floor, wall, or ceiling contact is still incomplete.
+
+## M4.5 — Basic painted court graphics
+
+### Deliverables
+
+- Blue player half and coral-red opponent half.
+- Green centre strip and perimeter apron.
+- Warm-white boundary, centre, circle, activation, and ball-position markings.
+- Subtle visual indicators at the unchanged player, ball, and target spawns.
+- Dove-grey gym walls with dark lower trim and simple charcoal panel accents.
+
+### Exit criteria
+
+- All graphics are procedural, visual-only meshes with no collision.
+- Existing court collision, spawn transforms, and T1–T5 gameplay remain unchanged.
 
 ## M1 — Playable first-person court
 
