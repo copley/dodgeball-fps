@@ -7,7 +7,6 @@ const TARGET_SCENE: PackedScene = preload("res://scenes/target.tscn")
 @onready var player_spawn: Marker3D = $Court/SpawnMarkers/PlayerSpawn
 @onready var ball_spawn: Marker3D = $Court/SpawnMarkers/BallSpawn
 @onready var target_spawn: Marker3D = $Court/SpawnMarkers/TargetSpawn
-@onready var target_launcher: Marker3D = $Court/SpawnMarkers/TargetLauncher
 @onready var round_result_label: Label = $UI/RoundResult
 @onready var catch_feedback_label: Label = $UI/CatchFeedback
 
@@ -37,17 +36,6 @@ func _ready() -> void:
 	add_child(target)
 	target.global_transform = target_spawn.global_transform
 	target.eliminated.connect(_on_target_eliminated)
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("development_launch") and ball.is_available():
-		var aim_position := player.global_position + Vector3.UP * 1.2
-		ball.launch_from(
-			target_launcher.global_transform,
-			aim_position - target_launcher.global_position,
-			14.0
-		)
-
 
 func _on_pickup_requested(player: PlayerController) -> void:
 	if player.can_pick_up(ball):

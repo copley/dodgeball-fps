@@ -137,24 +137,6 @@ func throw(direction: Vector3, speed: float) -> void:
 	thrown.emit(speed)
 
 
-func launch_from(new_transform: Transform3D, direction: Vector3, speed: float) -> bool:
-	if state != BallState.AVAILABLE:
-		return false
-	global_transform = new_transform
-	state = BallState.THROWN
-	hold_position = null
-	seconds_since_throw = 0.0
-	valid_hit_emitted_for_throw = false
-	collision_layer = PHYSICAL_COLLISION_LAYER
-	collision_mask = PHYSICAL_COLLISION_MASK
-	freeze = false
-	sleeping = false
-	linear_velocity = direction.normalized() * speed
-	angular_velocity = Vector3(4.0, 2.0, 1.0)
-	thrown.emit(speed)
-	return true
-
-
 func reset_to(new_spawn_transform: Transform3D) -> void:
 	spawn_transform = new_spawn_transform
 	hold_position = null

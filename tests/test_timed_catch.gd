@@ -39,11 +39,16 @@ func _spawn_player_and_ball() -> Array[Node]:
 
 func _make_incoming(ball: Dodgeball, player: PlayerController) -> void:
 	var launch_position := player.camera.global_position + Vector3(0.0, 0.0, -1.5)
-	ball.launch_from(
-		Transform3D(Basis.IDENTITY, launch_position),
-		player.camera.global_position - launch_position,
-		12.0
-	)
+	_throw_from(ball, launch_position, player.camera.global_position - launch_position)
+
+
+func _throw_from(ball: Dodgeball, position: Vector3, direction: Vector3) -> void:
+	var throw_marker := Marker3D.new()
+	root.add_child(throw_marker)
+	throw_marker.global_position = position
+	ball.hold_at(throw_marker)
+	ball.throw(direction, 12.0)
+	throw_marker.queue_free()
 
 
 func _test_successful_catch_and_possession_transfer() -> void:
@@ -68,11 +73,7 @@ func _test_failed_timing() -> void:
 	var player := nodes[0] as PlayerController
 	var ball := nodes[1] as Dodgeball
 	var early_position := player.camera.global_position + Vector3(0.0, 0.0, -6.0)
-	ball.launch_from(
-		Transform3D(Basis.IDENTITY, early_position),
-		player.camera.global_position - early_position,
-		12.0
-	)
+	_throw_from(ball, early_position, player.camera.global_position - early_position)
 	player.start_catch_window()
 	_expect(not player.catch_ball(ball), "early catch fails before the ball enters range")
 	player.catch_seconds_remaining = 0.0
@@ -89,11 +90,7 @@ func _test_front_detection() -> void:
 	var player := nodes[0] as PlayerController
 	var ball := nodes[1] as Dodgeball
 	var behind_position := player.camera.global_position + Vector3(0.0, 0.0, 1.5)
-	ball.launch_from(
-		Transform3D(Basis.IDENTITY, behind_position),
-		player.camera.global_position - behind_position,
-		12.0
-	)
+	_throw_from(ball, behind_position, player.camera.global_position - behind_position)
 	player.start_catch_window()
 	_expect(not player.catch_ball(ball), "incoming ball behind the player cannot be caught")
 	player.queue_free()

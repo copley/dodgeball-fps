@@ -35,5 +35,4 @@ The project currently includes the pilot through timed catching (T5).
 - `E`: pick up an available ball
 - Left mouse: hold to charge, release to throw
 - Right mouse: open the catch window
-- `T`: launch an available ball from the target side for catch testing
 - `Esc`: release the mouse cursor
