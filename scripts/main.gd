@@ -2,7 +2,7 @@ extends Node3D
 
 const PLAYER_SCENE: PackedScene = preload("res://scenes/player.tscn")
 const BALL_SCENE: PackedScene = preload("res://scenes/ball.tscn")
-const TARGET_SCENE: PackedScene = preload("res://scenes/target.tscn")
+const BOT_SCENE: PackedScene = preload("res://scenes/bot.tscn")
 
 @onready var player_spawn: Marker3D = $Court/SpawnMarkers/PlayerSpawn
 @onready var ball_spawn: Marker3D = $Court/SpawnMarkers/BallSpawn
@@ -17,8 +17,8 @@ const TARGET_SCENE: PackedScene = preload("res://scenes/target.tscn")
 
 var player: PlayerController
 var ball: Dodgeball
-var target: DodgeballTarget
-var target_eliminated: bool = false
+var bot: BotController
+var bot_eliminated: bool = false
 var gameplay_mouse_captured: bool = true
 var diagnostics_seconds_until_update: float = 0.0
 var frame_time_samples: Array[float] = []
@@ -43,11 +43,13 @@ func _ready() -> void:
 	ball.reset_to(ball_spawn.global_transform)
 	ball.valid_hit.connect(_on_ball_valid_hit)
 	ball.valid_player_hit.connect(_on_ball_valid_player_hit)
+	ball.valid_bot_hit.connect(_on_ball_valid_bot_hit)
 
-	target = TARGET_SCENE.instantiate()
-	add_child(target)
-	target.reset_to(target_spawn.global_transform)
-	target.eliminated.connect(_on_target_eliminated)
+	bot = BOT_SCENE.instantiate()
+	add_child(bot)
+	bot.configure(ball, player)
+	bot.reset_to(target_spawn.global_transform)
+	bot.eliminated.connect(_on_bot_eliminated)
 	$UI/PauseOverlay/PausePanel/Resume.pressed.connect(close_pause_menu)
 	$UI/PauseOverlay/PausePanel/RestartRound.pressed.connect(_on_menu_restart)
 	$UI/PauseOverlay/PausePanel/Controls.pressed.connect(_show_controls)
@@ -150,8 +152,8 @@ func _on_menu_restart() -> void:
 func restart_round() -> void:
 	player.reset_to(player_spawn.global_transform)
 	ball.reset_to(ball_spawn.global_transform)
-	target.reset_to(target_spawn.global_transform)
-	target_eliminated = false
+	bot.reset_to(target_spawn.global_transform)
+	bot_eliminated = false
 	round_result_label.visible = false
 	round_result_label.text = ""
 	catch_feedback_label.visible = false
@@ -172,24 +174,28 @@ func _on_catch_requested(catching_player: PlayerController) -> void:
 
 
 func _on_ball_valid_hit(hit_target: DodgeballTarget) -> void:
-	if hit_target == target:
-		target.eliminate()
+	if is_instance_valid(hit_target):
+		hit_target.eliminate()
 
 
 func _on_ball_valid_player_hit(hit_player: PlayerController) -> void:
 	if hit_player == player:
 		player.eliminate()
 
+func _on_ball_valid_bot_hit(hit_bot: BotController) -> void:
+	if hit_bot == bot:
+		bot.eliminate()
 
-func _on_target_eliminated() -> void:
-	if target_eliminated:
+func _on_bot_eliminated() -> void:
+	if bot_eliminated:
 		return
-	target_eliminated = true
-	round_result_label.text = "TARGET ELIMINATED"
+	bot_eliminated = true
+	round_result_label.text = "BOT ELIMINATED"
 	round_result_label.visible = true
 
 
 func _on_player_eliminated() -> void:
+	bot.stop_play()
 	round_result_label.text = "PLAYER ELIMINATED"
 	round_result_label.visible = true
 

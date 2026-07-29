@@ -2,7 +2,6 @@ extends SceneTree
 
 const PLAYER_SCENE: PackedScene = preload("res://scenes/player.tscn")
 const BALL_SCENE: PackedScene = preload("res://scenes/ball.tscn")
-const TARGET_SCENE: PackedScene = preload("res://scenes/target.tscn")
 const MAIN_SCENE: PackedScene = preload("res://scenes/main.tscn")
 
 var failures: int = 0
@@ -137,7 +136,7 @@ func _test_t1_to_t4_regressions() -> void:
 	_expect(main.get_node_or_null("Court") != null, "T1 main court still loads")
 	var player := main.get("player") as PlayerController
 	var ball := main.get("ball") as Dodgeball
-	var target := main.get("target") as DodgeballTarget
+	var bot := main.get("bot") as BotController
 	_expect(player != null and player.camera != null, "T2 player and camera still load")
 	ball.reset_to(Transform3D(Basis.IDENTITY, player.global_position))
 	_expect(player.can_pick_up(ball), "T3 available ball remains pickup eligible")
@@ -149,10 +148,10 @@ func _test_t1_to_t4_regressions() -> void:
 	main.call("_on_ball_valid_player_hit", player)
 	_expect(player.is_eliminated, "uncaught valid player hit still eliminates")
 	var elimination_count: Array[int] = [0]
-	target.eliminated.connect(func() -> void: elimination_count[0] += 1)
-	target.eliminate()
-	target.eliminate()
-	_expect(target.is_eliminated and elimination_count[0] == 1, "T4 target eliminates exactly once")
+	bot.eliminated.connect(func() -> void: elimination_count[0] += 1)
+	bot.eliminate()
+	bot.eliminate()
+	_expect(bot.is_eliminated and elimination_count[0] == 1, "T4 participant eliminates exactly once")
 	main.queue_free()
 	await process_frame
 

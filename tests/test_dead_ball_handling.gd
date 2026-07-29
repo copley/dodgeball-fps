@@ -26,15 +26,15 @@ func _run() -> void:
 func _test_new_throw_and_direct_hit() -> void:
 	var main := await _spawn_main()
 	var ball := main.ball as Dodgeball
-	var target := main.target as DodgeballTarget
+	var bot := main.bot as BotController
 	var hit_count: Array[int] = [0]
-	ball.valid_hit.connect(func(_target: DodgeballTarget) -> void: hit_count[0] += 1)
+	ball.valid_bot_hit.connect(func(_bot: BotController) -> void: hit_count[0] += 1)
 	_throw_from(ball, Vector3(0.0, 1.0, -6.0), Vector3(0.0, 0.0, -1.0), 16.0)
 	_expect(ball.state == Dodgeball.BallState.THROWN, "newly thrown ball is live")
-	_expect(await _wait_for_state(ball, Dodgeball.BallState.DEAD), "direct target impact makes ball DEAD")
-	_expect(target.is_eliminated, "direct live target impact eliminates")
-	_expect(hit_count[0] == 1, "direct live target impact emits exactly one valid hit")
-	ball._on_body_entered(target)
+	_expect(await _wait_for_state(ball, Dodgeball.BallState.DEAD), "direct bot impact makes ball DEAD")
+	_expect(bot.is_eliminated, "direct live bot impact eliminates")
+	_expect(hit_count[0] == 1, "direct live bot impact emits exactly one valid hit")
+	ball._on_body_entered(bot)
 	_expect(hit_count[0] == 1, "one throw cannot emit duplicate valid hits")
 	await _free_main(main)
 
@@ -68,17 +68,17 @@ func _test_dead_ball_restrictions() -> void:
 	var main := await _spawn_main()
 	var player := main.player as PlayerController
 	var ball := main.ball as Dodgeball
-	var target := main.target as DodgeballTarget
+	var bot := main.bot as BotController
 	var target_hit_count: Array[int] = [0]
-	ball.valid_hit.connect(func(_target: DodgeballTarget) -> void: target_hit_count[0] += 1)
+	ball.valid_bot_hit.connect(func(_bot: BotController) -> void: target_hit_count[0] += 1)
 	_throw_from(ball, Vector3(5.0, 1.5, 5.0), Vector3.DOWN, 12.0)
 	_expect(await _wait_for_state(ball, Dodgeball.BallState.DEAD), "floor bounce produces a dead ball")
 	ball.seconds_since_throw = 0.0
 	ball.global_position = Vector3(0.0, 1.0, -7.0)
 	ball.linear_velocity = Vector3(0.0, 0.0, -14.0)
-	_expect(await _wait_for_target_contact(ball, target), "moving dead ball physically contacts target")
-	_expect(not target.is_eliminated, "bounced ball contacting target does not eliminate")
-	_expect(target_hit_count[0] == 0, "dead moving ball emits no valid target hit")
+	_expect(await _wait_for_target_contact(ball, bot), "moving dead ball physically contacts bot")
+	_expect(not bot.is_eliminated, "bounced ball contacting bot does not eliminate")
+	_expect(target_hit_count[0] == 0, "dead moving ball emits no valid bot hit")
 	player.start_catch_window()
 	ball.global_position = player.camera.global_position + Vector3(0.0, 0.0, -1.0)
 	ball.linear_velocity = Vector3(0.0, 0.0, 8.0)
@@ -128,7 +128,7 @@ func _test_reset_and_entity_counts() -> void:
 	_expect(not ball.valid_hit_emitted_for_throw, "reset clears valid-hit flag")
 	_expect(_count_type(main, PlayerController) == 1, "five resets retain one player")
 	_expect(_count_type(main, Dodgeball) == 1, "five resets retain one ball")
-	_expect(_count_type(main, DodgeballTarget) == 1, "five resets retain one target")
+	_expect(_count_type(main, BotController) == 1, "five resets retain one bot")
 	await _free_main(main)
 
 
@@ -162,7 +162,7 @@ func _wait_for_state(ball: Dodgeball, expected_state: int, frames: int = 180) ->
 	return ball.state == expected_state
 
 
-func _wait_for_target_contact(ball: Dodgeball, target: DodgeballTarget, frames: int = 120) -> bool:
+func _wait_for_target_contact(ball: Dodgeball, target: BotController, frames: int = 120) -> bool:
 	for frame in frames:
 		if ball.global_position.distance_to(target.global_position + Vector3.UP) < 1.0:
 			return true

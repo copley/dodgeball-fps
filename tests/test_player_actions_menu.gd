@@ -102,7 +102,7 @@ func _test_pause_and_restart() -> void:
 	await process_frame
 	var player := main.player as PlayerController
 	var ball := main.ball as Dodgeball
-	var target := main.target as DodgeballTarget
+	var bot := main.bot as BotController
 	main._unhandled_input(_action_event("pause_menu"))
 	_expect(paused, "Escape pause path pauses SceneTree")
 	_expect(main.pause_overlay.visible, "pause overlay opens")
@@ -123,7 +123,7 @@ func _test_pause_and_restart() -> void:
 	player.is_crouching = true
 	player.dodge_cooldown_remaining = 1.0
 	player.catch_seconds_remaining = 1.0
-	target.eliminate()
+	bot.eliminate()
 	main._unhandled_input(_action_event("restart_round"))
 	for reset_index in 4:
 		main.restart_round()
@@ -133,11 +133,15 @@ func _test_pause_and_restart() -> void:
 	_expect(player.dodge_cooldown_remaining == 0.0 and player.catch_seconds_remaining == 0.0, "reset clears dodge and catch")
 	_expect(ball.state == Dodgeball.BallState.AVAILABLE, "reset restores ball AVAILABLE")
 	_expect(ball.global_transform.is_equal_approx(main.ball_spawn.global_transform), "reset restores BallSpawn")
-	_expect(not target.is_eliminated and target.global_transform.is_equal_approx(main.target_spawn.global_transform), "reset restores active target")
+	_expect(
+		not bot.is_eliminated
+		and bot.global_position.is_equal_approx(main.target_spawn.global_position),
+		"reset restores active bot"
+	)
 	_expect(not main.round_result_label.visible and not main.catch_feedback_label.visible, "reset clears feedback")
 	_expect(_count_entities(main, "player") == 1, "five resets leave one player")
 	_expect(_count_entities(main, "ball") == 1, "five resets leave one ball")
-	_expect(_count_entities(main, "target") == 1, "five resets leave one target")
+	_expect(_count_entities(main, "bot") == 1, "five resets leave one bot")
 	main.open_pause_menu()
 	main._on_menu_restart()
 	_expect(not paused and not main.pause_overlay.visible, "menu Restart Round resets and resumes")
@@ -158,7 +162,7 @@ func _test_t1_to_t5_5_regressions() -> void:
 	await process_frame
 	var player := main.player as PlayerController
 	var ball := main.ball as Dodgeball
-	var target := main.target as DodgeballTarget
+	var bot := main.bot as BotController
 	_expect(main.get_node_or_null("Court/CourtGraphics") != null, "painted court graphics remain")
 	_expect(player.camera != null, "first-person camera remains")
 	ball.reset_to(Transform3D(Basis.IDENTITY, player.global_position))
@@ -167,10 +171,10 @@ func _test_t1_to_t5_5_regressions() -> void:
 	ball.throw(Vector3.FORWARD, player.minimum_throw_speed)
 	_expect(ball.is_thrown(), "charged throwing path remains")
 	var eliminated_count: Array[int] = [0]
-	target.eliminated.connect(func() -> void: eliminated_count[0] += 1)
-	target.eliminate()
-	target.eliminate()
-	_expect(eliminated_count[0] == 1, "target elimination remains single-fire")
+	bot.eliminated.connect(func() -> void: eliminated_count[0] += 1)
+	bot.eliminate()
+	bot.eliminate()
+	_expect(eliminated_count[0] == 1, "bot elimination is single-fire")
 	player.reset_to(main.player_spawn.global_transform)
 	ball.reset_to(Transform3D(Basis.IDENTITY, player.camera.global_position + Vector3(0.0, 0.0, -1.0)))
 	var marker := Marker3D.new()
@@ -190,7 +194,7 @@ func _count_entities(parent: Node, entity_type: String) -> int:
 		if (
 			(entity_type == "player" and child is PlayerController)
 			or (entity_type == "ball" and child is Dodgeball)
-			or (entity_type == "target" and child is DodgeballTarget)
+			or (entity_type == "bot" and child is BotController)
 		):
 			count += 1
 	return count

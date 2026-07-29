@@ -103,7 +103,7 @@ func _test_court_invariants(main: Node3D) -> void:
 	)
 	_expect(_count_type(main, PlayerController) == 1, "exactly one player remains")
 	_expect(_count_type(main, Dodgeball) == 1, "exactly one ball remains")
-	_expect(_count_type(main, DodgeballTarget) == 1, "exactly one target remains")
+	_expect(_count_type(main, BotController) == 1, "exactly one bot remains")
 
 
 func _test_render_invariants(main: Node3D) -> void:

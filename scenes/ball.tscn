@@ -20,6 +20,7 @@ friction = 0.8
 bounce = 0.15
 
 [node name="Ball" type="RigidBody3D"]
+process_mode = 1
 collision_layer = 4
 collision_mask = 9
 mass = 0.45
