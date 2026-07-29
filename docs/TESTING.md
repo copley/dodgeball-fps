@@ -24,6 +24,17 @@ done
 
 Any parser error, missing resource, invalid node path, or non-zero exit status blocks completion.
 
+The focused complete-round-loop suite is:
+
+```bash
+godot --headless --path . --script tests/test_complete_round_loop.gd
+```
+
+It covers both winners, invalid ball states, one-result acceptance, gameplay
+locking, pause-aware timing, both manual cancellation paths, five manual resets,
+twenty automatic completions, entity counts, clean state restoration, and the
+bot resuming retrieval and throwing.
+
 ## Manual pilot checklist
 
 - [ ] Project opens directly into the court.
@@ -62,6 +73,16 @@ Any parser error, missing resource, invalid node path, or non-zero exit status b
 - [ ] Pause freezes bot state/timers and elimination stops all bot actions.
 - [ ] Reset restores one player, one ball, and one bot.
 - [ ] Five consecutive resets create no duplicate entities or events.
+- [ ] A direct human live throw displays PLAYER WINS exactly once.
+- [ ] A direct bot live throw displays BOT WINS exactly once.
+- [ ] Player controls and bot actions stop for the complete result delay.
+- [ ] One automatic reset clears the result and restores active play.
+- [ ] Pause during the result delay freezes its remaining time and resumes it safely.
+- [ ] R during the result delay resets immediately without a later stale reset.
+- [ ] Pause-menu Restart Round during the result delay has the same cancellation-safe result.
+- [ ] Ten consecutive interactive rounds retain one player, one bot, and one
+	  ball without duplicate results, frozen controls, lost possession, or stale
+	  delayed resets.
 - [ ] Movement and ball motion appear smooth with physics interpolation enabled.
 - [ ] F3 toggles FPS, frame time, physics time, draw-call, and object diagnostics.
 - [ ] Restarted entities do not visibly interpolate from their previous position.
@@ -81,3 +102,20 @@ Each implementation PR must include:
 - Manual checks performed.
 - Known limitations.
 - Screenshots or a short capture when behaviour is visual and cannot be established by logs.
+
+## M7 manual acceptance procedure
+
+These checks require an interactive run and are not satisfied by headless tests:
+
+1. Start a round and let the bot retrieve and throw.
+2. Let a direct bot throw hit the player; confirm `BOT WINS` appears immediately.
+3. Confirm controls and bot actions stop during the result delay.
+4. Confirm one clean automatic reset occurs, the result clears, and the bot resumes play.
+5. Reset and eliminate the bot with a direct live throw; confirm `PLAYER WINS` appears once.
+6. Pause during the result delay and confirm reset waits for resume.
+7. Press R during the result delay and confirm no second delayed reset occurs.
+8. Repeat with pause-menu Restart Round.
+9. Play at least ten consecutive rounds and confirm one player, one bot, one
+   ball, no duplicated results, no frozen controls, no lost possession, and no
+   stale delayed reset.
+10. Confirm F3 diagnostics and court rendering remain unchanged.

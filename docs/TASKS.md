@@ -64,11 +64,16 @@ Complete tasks sequentially. Each implementation task should have its own branch
   - Acceptance: one player, one bot, and one ball sustain ten deterministic
 	retrieve-and-throw cycles and all prior regression suites pass.
 
-- [ ] **T7 — Round reset and pilot validation**
-  - Perform final prototype validation and close remaining one-ball loop gaps.
-  - Acceptance: all pilot mechanics pass the final manual play-test without
-	duplicate entities, signals, or elimination events.
+- [x] **T7 — Round reset and pilot loop completion**
+  - Add explicit round states, single-winner acceptance, result feedback,
+	pause-aware automatic reset, cancellation-safe manual reset, and in-place
+	entity restoration.
+  - Acceptance: automated gameplay regressions and twenty deterministic rounds
+	pass without duplicate entities, signals, ownership, timers, results, or
+	elimination events. Required manual M7 checks are recorded in
+	`docs/TESTING.md`.
 
 ## Stop condition
 
-Stop after T7. Any extra feature requires an explicit scope decision and a new issue.
+Proceed only to M8 prototype validation and stop decision. Any extra feature
+requires an explicit scope decision and a new issue.

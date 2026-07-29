@@ -35,7 +35,28 @@ Deliver a playable Godot 4 proof of concept demonstrating first-person dodgeball
   be caught. After the pickup grace period, a sleeping or sufficiently slow
   dead ball becomes available again.
 - A successful catch prevents elimination and gives possession.
-- After elimination, the round can reset to its initial state.
+- After elimination, the round displays the winner, pauses active play for a
+  configurable delay, and automatically resets the existing entities.
+
+## Round lifecycle and results
+
+- `Main` owns explicit, mutually exclusive `STARTING`, `ACTIVE`, `RESOLVING`,
+  and `RESETTING` states. Normal gameplay and elimination acceptance are
+  permitted only in `ACTIVE`.
+- A direct live human throw eliminating the bot produces `PLAYER WINS`; a
+  direct live bot throw eliminating the human produces `BOT WINS`.
+- The first valid elimination accepted by `Main` enters `RESOLVING`, emits one
+  result, and fixes the winner. Later or duplicate events are ignored; draws
+  are not supported.
+- Dead, bounced, available, held, or caught balls cannot produce a result.
+- During `RESOLVING`, player and bot actions stop and the ball is neutralized.
+  The result remains visible for the complete configurable delay (2 seconds by
+  default).
+- A pause-aware one-shot timer enters `RESETTING`, restores the existing player,
+  bot, and ball in place, clears result/action/elimination state, and returns to
+  `ACTIVE`.
+- R or pause-menu Restart Round cancels the pending one-shot timer, performs one
+  immediate clean reset, and prevents any stale delayed reset.
 
 ## Pilot controls
 
@@ -108,6 +129,12 @@ Deliver a playable Godot 4 proof of concept demonstrating first-person dodgeball
 14. Five consecutive restarts leave exactly one player, one ball, and one bot.
 15. Ten bot retrieve-and-throw cycles complete without duplicate balls, lost
 	ownership, stuck states, or duplicate throws.
+16. One valid elimination produces exactly one winner and result, locks play
+	until reset, then automatically restores `ACTIVE`.
+17. Pausing freezes the result delay; manual restart during that delay cancels
+	the pending automatic reset.
+18. Twenty deterministic round completions retain exactly one player, one bot,
+	and one ball without stale timers, duplicate results, or lost ownership.
 
 ## Explicit exclusions
 

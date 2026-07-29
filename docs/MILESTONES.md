@@ -46,7 +46,7 @@ Do not add:
 | M5.1 | Physics interpolation and performance diagnostics | Complete |
 | M5.2 | Render quality and visual smoothness | Validation pending |
 | M6 | Basic ball-playing bot | Complete |
-| M7 | Complete elimination and reset loop | Planned |
+| M7 | Complete elimination and reset loop | Complete |
 | M8 | Prototype validation and stop decision | Planned |
 
 ## Current implementation checkpoint
@@ -59,6 +59,10 @@ ceiling, or wall contact makes the physical ball dead until it slows or sleeps.
 The target's runtime role is now filled by one basic ball-playing bot that
 repeatedly retrieves and throws the same ball. Deterministic tests cover
 throw ownership, elimination, pause, reset, and ten consecutive exchange cycles.
+The complete round loop now accepts one winner, displays the result, locks
+gameplay through a pause-aware delay, and resets the existing player, bot, and
+ball in place. Deterministic coverage includes twenty consecutive automatic
+rounds and cancellation-safe manual restarts.
 
 ## M5.1 — Performance smoothing and diagnostics
 
@@ -284,8 +288,12 @@ SEEK_BALL -> MOVE_TO_BALL -> HOLD_BALL -> AIM -> THROW -> SEEK_BALL
 
 ### Exit criteria
 
-- Five consecutive automatic or manual resets produce no duplicate entities, signals, hits, or result events.
-- Resetting while the ball is available, held, thrown, caught, or dead produces the same clean initial state.
+- Five consecutive automatic or manual resets produce no duplicate entities,
+  signals, hits, or result events. (Automated: complete.)
+- Resetting restores the same clean initial state and twenty automatic
+  completions retain one player, one bot, and one ball. (Automated: complete.)
+- Required interactive round-loop checks are recorded in `docs/TESTING.md`;
+  final prototype validation remains M8 work.
 
 ## M8 — Prototype validation and stop decision
 

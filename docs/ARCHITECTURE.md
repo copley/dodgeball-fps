@@ -75,6 +75,30 @@ render-frame deltas in a bounded 120-sample window and updates the F3 label from
 that window and read-only `Performance` monitors four times per second. The
 diagnostics do not modify simulation values or select quality settings.
 
+`Main` is the sole round-state authority:
+
+```text
+STARTING -> ACTIVE -> RESOLVING -> RESETTING -> ACTIVE
+```
+
+Only `ACTIVE` accepts gameplay actions or elimination results. The first
+accepted elimination records an immutable winner for that round, emits one
+`round_ended` signal, updates the existing result label, gates the player and
+bot, and neutralizes the existing ball. A single reusable, one-shot
+`RoundResetTimer` is explicitly pausable, so the remaining inter-round delay
+freezes with the pause menu even though `Main` continues handling menu input.
+Manual restart stops that timer before performing one in-place reset, preventing
+a stale delayed callback. A reset serial separately invalidates delayed local UI
+feedback.
+
+Reset responsibilities remain local: Player clears movement, camera, crouch,
+jump/dodge/catch/charge, possession, elimination, and its gameplay gate; Bot
+clears movement, state target/timers, possession, pending throw, elimination,
+and its gameplay gate; Ball clears holder/thrower, velocity, hit flags,
+collision settings, and interpolation while returning to `AVAILABLE`. `Main`
+clears the accepted winner and feedback, emits `round_reset`, and returns to
+`ACTIVE`. Signal connections are made once in `_ready()` and never during reset.
+
 `Main` configures the bot with the existing ball and player. The bot never
 creates or replaces either. Its state machine is:
 

@@ -2,17 +2,31 @@
 
 ## Mission
 
-Build only the six-hour Godot 4 dodgeball FPS pilot defined in `docs/SPEC.md`.
+Build only the Godot 4 one-human-versus-one-basic-bot, one-court, one-ball
+vertical slice defined by the governing documentation.
 
 ## Required workflow
 
-1. Read this file, `docs/SPEC.md`, `docs/ARCHITECTURE.md`, `docs/TASKS.md`, and `docs/TESTING.md` before changing files.
+1. Read this file, `README.md`, `docs/SPEC.md`, `docs/ARCHITECTURE.md`,
+   `docs/TASKS.md`, `docs/TESTING.md`, and `docs/MILESTONES.md` before changing
+   files.
 2. Work on exactly one issue or task at a time.
 3. Inspect existing scenes and scripts before editing them.
 4. Make the smallest change that satisfies the current acceptance criteria.
 5. Run the validation commands in `docs/TESTING.md`.
 6. Update `docs/TASKS.md` only when a task is demonstrably complete.
 7. Stop and report the blocker when validation fails or requirements conflict.
+
+## Permanent gameplay invariants
+
+- Keep exactly one human player, one basic deterministic bot, one court, and
+  one physical ball.
+- Keep gameplay offline only.
+- `Main` owns spawning, round state, elimination, results, and reset.
+- Ball and bot state transitions must remain explicit.
+- Never duplicate entities, signals, ownership, throws, or elimination events.
+- Preserve all completed gameplay, rendering, and diagnostic behaviour.
+- All existing automated regression suites must pass.
 
 ## Scope constraints
 
@@ -22,7 +36,7 @@ Do not add:
 - Matchmaking, accounts, or backend services.
 - Character progression, cosmetics, achievements, or monetisation.
 - Multiple courts, complex menus, polished art, or cinematic content.
-- Complex AI beyond the pilot requirement.
+- AI beyond the basic deterministic behaviour required by the vertical slice.
 - Third-party addons unless explicitly approved.
 
 ## Godot conventions
@@ -43,7 +57,8 @@ Do not add:
 - Use one branch and pull request per scoped issue.
 - Do not modify unrelated files.
 - Use clear commit messages.
-- Never mark work complete without validation evidence.
+- Never mark work complete without automated validation evidence and recorded
+  manual play-test requirements.
 
 ## Definition of done
 
@@ -51,6 +66,6 @@ A task is complete only when:
 
 - Its acceptance criteria pass.
 - The project opens without parse errors.
-- Headless validation succeeds where supported.
+- Complete automated regression and headless validation succeeds.
 - Relevant manual play-test checks are recorded.
 - No out-of-scope features were added.
