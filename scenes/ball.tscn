@@ -20,12 +20,14 @@ bounce = 0.15
 
 [node name="Ball" type="RigidBody3D"]
 collision_layer = 4
-collision_mask = 1
+collision_mask = 9
 mass = 0.45
 physics_material_override = SubResource("PhysicsMaterial_ball")
 linear_damp = 0.8
 angular_damp = 1.5
 continuous_cd = true
+contact_monitor = true
+max_contacts_reported = 4
 script = ExtResource("1_ball")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
