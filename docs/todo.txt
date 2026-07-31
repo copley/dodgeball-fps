@@ -1,0 +1,559 @@
+I studied your current dodgeball-fps implementation and the most relevant available reference code. The conclusion is: keep your existing architecture and evolve it—do not import an FPS weapon framework.
+
+Your current implementation is already cleaner and more appropriate for dodgeball than the generic FPS systems.
+
+What you currently have
+
+Your human throw is presently:
+
+charge ratio
+    ↓
+interpolate 8–22 m/s
+    ↓
+camera-forward direction
+    ↓
+ball linear velocity = direction × speed
+
+The ball is a RigidBody3D with:
+
+Mass: 0.45 kg.
+
+Continuous collision detection.
+
+Jolt Physics.
+
+Physical bounce and damping.
+
+Explicit AVAILABLE → HELD → THROWN → DEAD lifecycle.
+
+Human/bot throw ownership.
+
+Catch and elimination integration.
+
+
+Relevant repository files:
+
+player.gd
+
+ball.gd
+
+bot.gd
+
+ball.tscn
+
+
+The existing implementation is a good foundation. Its main limitation is that Dodgeball.throw() receives only direction and scalar speed. It does not receive the complete release state.
+
+What the references teach us
+
+GDQuest grenade system
+
+The useful ideas in GDQuest’s grenade launcher are:
+
+Calculate a complete initial velocity before releasing the projectile.
+
+Separate launch calculation from projectile behaviour.
+
+Predict the flight using the same velocity and gravity.
+
+Aim from the camera but launch from a physical marker.
+
+Use a collision query to avoid predicting through geometry.
+
+
+Its trajectory equation is conventional:
+
+\[
+p(t)=p_0+v_0t+\frac12gt^2
+\]
+
+However, that calculation supports only a normal ballistic parabola. It will not correctly predict your curved ball once lateral acceleration is introduced.
+
+Projectile Curve Visualizer
+
+The current plugin demonstrates prediction, moving throwers and moving targets, which is particularly useful for your future bot and practice mode. However, its publisher marks the version unstable. Treat it as reference material, not a dependency. Projectile Curve Visualizer
+
+Generic FPS weapon systems
+
+The Simple FPS Weapon System separates configuration, firing and projectiles into components. That architectural principle is useful, but the complete framework is not.
+
+Your game has:
+
+One held physical ball.
+
+Possession transfer.
+
+Catching.
+
+Live/dead ball rules.
+
+One-ball ownership.
+
+Round reset invariants.
+
+
+A firearm framework assumes disposable spawned projectiles, ammunition and weapon switching. Importing it would work against your design.
+
+Recommended architecture
+
+Introduce three separate responsibilities:
+
+flowchart TD
+    A["Player release context"] --> B["Throw calculator"]
+    B --> C["Throw solution"]
+    C --> D["Physical ball"]
+    C --> E["Trajectory predictor"]
+    C --> F["Bot aiming"]
+
+1. Release context
+
+At the instant the mouse button is released, capture:
+
+release_context:
+  aim_direction: camera forward
+  launch_position: ball hold marker
+  player_velocity: current CharacterBody3D velocity
+  camera_right: camera horizontal right
+  charge_ratio: 0.0 to 1.0
+  thrower: human
+
+This is a snapshot. Do not let later player movement alter a ball already in flight.
+
+2. Throw solution
+
+A pure throw calculator should transform that context into:
+
+throw_solution:
+  initial_velocity: Vector3
+  spin_axis: Vector3
+  spin_rate: float
+  curve_strength: float
+  release_speed: float
+  throw_sequence_id: integer
+
+Both human and bot throws should eventually produce the same structure.
+
+3. Ball flight
+
+Dodgeball should receive the finished solution and own:
+
+Physical velocity.
+
+Angular velocity.
+
+Curve force.
+
+Collision processing.
+
+Live/dead state.
+
+Catchability.
+
+Resetting.
+
+
+The player decides the intended throw. The ball decides how that throw physically evolves.
+
+Movement inheritance
+
+Use the player’s actual horizontal velocity at release:
+
+\[
+v_{\text{launch}}
+=
+v_{\text{aim}}
++
+k_{\text{inherit}}v_{\text{player-horizontal}}
+\]
+
+Where:
+
+\(v_{\text{aim}} = direction \times charged_speed\)
+
+\(k_{\text{inherit}}\) is initially around 0.35–0.50
+
+Inherited player velocity should be capped.
+
+
+This automatically produces:
+
+Faster forward throws while sprinting.
+
+Slightly slower relative throws while retreating.
+
+Lateral displacement when strafing.
+
+Natural jump contribution, if you deliberately include vertical velocity.
+
+
+I recommend inheriting horizontal velocity first and excluding vertical jump velocity until playtesting proves it useful.
+
+Important balance choice
+
+Do not inherit 100% of sprint velocity. Your player can sprint at 10 m/s, while the ball currently throws at up to 22 m/s. Full inheritance could produce approximately 32 m/s, fundamentally changing catch timing.
+
+Start with:
+
+movement_inheritance:
+  horizontal_ratio: 0.4
+  maximum_bonus: 4.0_m_per_second
+  vertical_ratio: 0.0
+
+Strafe-generated curve
+
+Calculate lateral release velocity relative to the camera:
+
+\[
+v_{\text{lateral}}
+=
+v_{\text{player}}\cdot camera_{\text{right}}
+\]
+
+Normalize it against sprint speed:
+
+\[
+s=\operatorname{clamp}
+\left(
+\frac{v_{\text{lateral}}}{v_{\text{sprint}}},
+-1,1
+\right)
+\]
+
+Then derive spin and curve:
+
+strafe_right:
+  signed_strafe: positive
+  curve_direction: right
+
+strafe_left:
+  signed_strafe: negative
+  curve_direction: left
+
+standing_still:
+  signed_strafe: zero
+  curve: none
+
+I would not directly rotate the initial aim direction to create the entire curve. That produces a diagonal straight throw, not a curling throw.
+
+Instead:
+
+1. Apply a small inherited lateral velocity at release.
+
+
+2. Record signed spin.
+
+
+3. Apply bounded lateral acceleration while the ball remains THROWN.
+
+
+
+Magnus-style flight
+
+A physical approximation can use:
+
+\[
+a_{\text{curve}}=k(\omega\times v)
+\]
+
+Where:
+
+\(\omega\) is the spin vector.
+
+\(v\) is current ball velocity.
+
+\(k\) is a tuned gameplay coefficient.
+
+
+But perfect aerodynamic realism is not the goal. A real dodgeball’s deformation, drag and seams make accurate simulation difficult. Your objective is a predictable competitive mechanic.
+
+Use a gameplay-controlled approximation with:
+
+Maximum lateral acceleration.
+
+Curve weakening as the ball slows.
+
+Curve active only while THROWN.
+
+No curve once the ball hits a dead surface.
+
+Identical fixed-step logic for actual flight and prediction.
+
+
+Suggested initial behaviour:
+
+curve:
+  maximum_lateral_acceleration: 2.0_to_3.0_m_per_second_squared
+  full_curve_strafe_threshold: sprint_speed
+  minimum_speed_for_curve: 4.0_m_per_second
+  curve_fades_with_speed: true
+  curve_after_collision: false
+
+The effect should be readable but not allow a player to throw around an opponent at extreme angles.
+
+Angular velocity
+
+Your ball currently receives the same arbitrary angular velocity on every throw:
+
+(4, 2, 1)
+
+Replace that conceptually with spin derived from the release:
+
+visual_spin:
+  backspin: charge-dependent
+  sidespin: strafe-dependent
+  axis: based on aim direction and camera orientation
+
+Angular velocity and curve strength should be related, but not necessarily physically identical. Separating the visual rotation coefficient from the gameplay curve coefficient will make balancing easier.
+
+Ball “weight”
+
+Mass alone will not make the ball drop faster. In ordinary gravity, light and heavy objects fall at the same acceleration.
+
+Weight should be communicated through:
+
+Maximum release speed.
+
+Acceleration/charge time.
+
+Air drag.
+
+Bounce.
+
+Sound.
+
+Catch difficulty.
+
+Impact feedback.
+
+Animation and camera movement.
+
+
+Your current linear_damp = 0.8 may make the ball lose speed fairly aggressively. Before implementing curve, measure current speed over several distances. For a skill-based court game, live-flight damping may need to be lower or explicitly controlled.
+
+Do not change mass, damping, bounce and throw speed simultaneously. You would lose the ability to identify which change improved the throw.
+
+Aiming correctly from first person
+
+There are two different origins:
+
+Camera centre determines what the player intends to hit.
+
+Ball marker determines where the ball physically begins.
+
+
+Use the camera to raycast toward the crosshair, obtain an aim point, and then calculate:
+
+\[
+direction=
+\operatorname{normalize}(aimPoint-launchPosition)
+\]
+
+This prevents close-range throws from travelling beside the crosshair because the camera and hand marker are offset.
+
+The release should also check whether the launch position overlaps a wall or participant. Do not allow the ball to begin inside geometry.
+
+Trajectory prediction
+
+Once curve is added, GDQuest’s closed-form parabola is insufficient. Use a fixed-step numerical predictor:
+
+position = launch position
+velocity = calculated initial velocity
+
+repeat:
+    gravity acceleration
+    curve acceleration
+    drag
+    velocity update
+    position update
+    collision query
+
+The predictor and actual ball must call the same pure flight-dynamics calculation. Otherwise, the preview line and actual throw will diverge.
+
+For your competitive FPS, I would initially expose trajectory prediction only in:
+
+Development diagnostics.
+
+Practice mode.
+
+Bot aiming tests.
+
+
+Do not necessarily show a trajectory line during competitive matches.
+
+Improving the bot
+
+Your bot currently aims directly at the player’s present position:
+
+\[
+direction=playerPosition-ballPosition
+\]
+
+This ignores:
+
+Gravity.
+
+Player velocity.
+
+Time of flight.
+
+Curve.
+
+Court obstruction.
+
+
+The next bot should:
+
+1. Estimate an initial flight time.
+
+
+2. Predict player position:
+
+
+
+\[
+p_{\text{future}}=p_{\text{player}}+v_{\text{player}}t
+\]
+
+3. Calculate a ballistic throw toward that point.
+
+
+4. Simulate the proposed trajectory.
+
+
+5. Adjust aim iteratively.
+
+
+6. Add difficulty-dependent error only after finding a valid solution.
+
+
+
+The bot should use exactly the same ThrowSolution and ball-flight system as the human. It must not have a separate simplified projectile model.
+
+Recommended implementation sequence
+
+Phase 1 — Refactor without changing behaviour
+
+Introduce the release-context and throw-solution boundary.
+
+Preserve the current straight charged throw exactly.
+
+Change Dodgeball.throw(direction, speed, thrower) into a vector/solution-based launch boundary.
+
+Ensure all existing tests still pass.
+
+
+Phase 2 — Movement inheritance
+
+Add capped horizontal velocity inheritance.
+
+Test standing, walking, sprinting, retreating and strafing releases.
+
+Keep curve disabled.
+
+
+Phase 3 — Sidespin and curve
+
+Derive signed strafe at release.
+
+Replace arbitrary angular velocity.
+
+Apply bounded lateral flight acceleration.
+
+Disable it immediately on DEAD, CAUGHT, HELD or reset.
+
+
+Phase 4 — Prediction laboratory
+
+Create a development practice scene containing:
+
+Distance markers.
+
+Stationary target.
+
+Moving lateral target.
+
+Throw-speed display.
+
+Player release velocity.
+
+Sidespin value.
+
+Predicted and actual landing markers.
+
+
+Phase 5 — Bot solver
+
+Stationary ballistic targeting.
+
+Moving-target lead.
+
+Difficulty-dependent reaction time and error.
+
+Later, controlled bot curve throws.
+
+
+Testing requirements
+
+Add deterministic tests for:
+
+straight_throw:
+  stationary_player: no lateral curve
+
+movement_inheritance:
+  forward_sprint: greater forward velocity
+  retreat: reduced world-forward velocity
+  inheritance: capped
+
+strafe_curve:
+  right_strafe: positive lateral curve
+  left_strafe: negative lateral curve
+  equal_strafes: approximately symmetric
+  stationary_release: zero sidespin
+
+lifecycle:
+  dead_ball: no additional curve
+  caught_ball: zero velocity and spin
+  reset_ball: clears all flight state
+
+prediction:
+  predicted_path: agrees with actual fixed-step path
+  tolerance: explicitly bounded
+
+regression:
+  catches: still valid
+  eliminations: emitted once
+  thrower_ownership: preserved
+  bot_cycles: no duplicate throws
+  round_reset: clears flight metadata
+
+Final recommendation
+
+Do not replace your existing throw with the reference projects. Your solution should be:
+
+keep:
+  - existing RigidBody3D ball
+  - Jolt continuous collision
+  - explicit ball states
+  - possession and catching
+  - thrower ownership
+  - one-ball lifecycle
+
+borrow:
+  gdquest:
+    - complete initial-velocity calculation
+    - camera aim versus launch origin
+    - trajectory simulation structure
+
+  projectile_visualizer:
+    - prediction concept
+    - moving-target interception concept
+
+build_custom:
+  - release context
+  - movement inheritance
+  - strafe-derived spin
+  - bounded Magnus-style curve
+  - shared trajectory simulator
+  - bot ballistic solver
+
+This gives you a Counter-Strike-like deterministic skill system: movement at release matters, direction remains mouse-controlled, sprint contributes power, strafing creates learnable curl, and humans and bots obey the same physics.
