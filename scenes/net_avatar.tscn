@@ -1,0 +1,39 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/net_avatar.gd" id="1_script"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape_avatar"]
+radius = 0.45
+height = 1.8
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_avatar"]
+radius = 0.45
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial_avatar"]
+albedo_color = Color(0.15, 0.55, 0.95, 1)
+roughness = 0.8
+
+[node name="NetAvatar" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 7
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.9, 0)
+shape = SubResource("CapsuleShape_avatar")
+
+[node name="BodyMesh" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_avatar")
+material_override = SubResource("StandardMaterial_avatar")
+
+[node name="Head" type="Node3D" parent="."]
+position = Vector3(0, 1.6, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Head"]
+current = false
+near = 0.05
+
+[node name="HoldPoint" type="Marker3D" parent="Head/Camera3D"]
+position = Vector3(0.42, -0.25, -0.9)
