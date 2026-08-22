@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/net_ball.gd" id="1_script"]
+
+[sub_resource type="SphereShape3D" id="SphereShape_ball"]
+radius = 0.28
+
+[sub_resource type="SphereMesh" id="SphereMesh_ball"]
+radius = 0.28
+height = 0.56
+radial_segments = 24
+rings = 12
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial_ball"]
+albedo_color = Color(1, 0.42, 0.08, 1)
+roughness = 0.72
+
+[node name="NetBall" type="RigidBody3D"]
+collision_layer = 4
+collision_mask = 3
+contact_monitor = true
+max_contacts_reported = 8
+mass = 0.65
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape_ball")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_ball")
+material_override = SubResource("StandardMaterial_ball")
