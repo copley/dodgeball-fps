@@ -2,70 +2,101 @@
 
 ## Mission
 
-Build only the Godot 4 one-human-versus-one-basic-bot, one-court, one-ball
-vertical slice defined by the governing documentation.
+Preserve the completed one-human-versus-one-bot prototype while developing the
+approved 2v2 browser multiplayer vertical slice on the
+`feature/2v2-browser-multiplayer-slice` branch.
+
+The original prototype remains a regression reference. New product work lives
+behind the multiplayer entry point and must not silently break the legacy
+single-player scene.
 
 ## Required workflow
 
 1. Read this file, `README.md`, `docs/SPEC.md`, `docs/ARCHITECTURE.md`,
-   `docs/TASKS.md`, `docs/TESTING.md`, and `docs/MILESTONES.md` before changing
-   files.
-2. Work on exactly one issue or task at a time.
-3. Inspect existing scenes and scripts before editing them.
-4. Make the smallest change that satisfies the current acceptance criteria.
-5. Run the validation commands in `docs/TESTING.md`.
-6. Update `docs/TASKS.md` only when a task is demonstrably complete.
-7. Stop and report the blocker when validation fails or requirements conflict.
+   `docs/TASKS.md`, `docs/TESTING.md`, `docs/MILESTONES.md`, and
+   `docs/MULTIPLAYER_SLICE.md` before changing gameplay files.
+2. Inspect existing scenes and scripts before editing them.
+3. Prefer additive migration over rewriting proven prototype mechanics.
+4. Keep server authority explicit for competitive state.
+5. Run the validation commands in `docs/TESTING.md` whenever a Godot runtime is
+   available.
+6. Record known manual/browser/network checks that cannot be established by
+   headless tests.
 
-## Permanent gameplay invariants
+## Legacy prototype invariants
 
-- Keep exactly one human player, one basic deterministic bot, one court, and
-  one physical ball.
-- Keep gameplay offline only.
-- `Main` owns spawning, round state, elimination, results, and reset.
-- Ball and bot state transitions must remain explicit.
-- Never duplicate entities, signals, ownership, throws, or elimination events.
-- Preserve all completed gameplay, rendering, and diagnostic behaviour.
-- All existing automated regression suites must pass.
+The existing `scenes/main.tscn` prototype must continue to preserve:
 
-## Scope constraints
+- one human player, one deterministic bot, one court, and one physical ball;
+- offline operation;
+- the existing pickup, charge/throw, catch, dodge, elimination, reset, pause,
+  rendering and diagnostics behaviour;
+- explicit ball and bot state transitions;
+- no duplicate entities, signals, ownership, throws, or elimination events.
 
-Do not add:
+These invariants apply to the legacy prototype path, not to the separately
+approved multiplayer scene.
 
-- Online multiplayer or networking.
-- Matchmaking, accounts, or backend services.
-- Character progression, cosmetics, achievements, or monetisation.
-- Multiple courts, complex menus, polished art, or cinematic content.
-- AI beyond the basic deterministic behaviour required by the vertical slice.
-- Third-party addons unless explicitly approved.
+## Approved multiplayer-slice scope
+
+The multiplayer vertical slice may add:
+
+- exactly two teams with up to two active slots per team;
+- human players connected over Godot high-level multiplayer using WebSockets;
+- deterministic bots filling unoccupied match slots;
+- multiple physical dodgeballs;
+- a short timed score match with respawn after elimination;
+- server-authoritative possession, throws, catches, hits, score and match time;
+- browser-compatible client rendering and input;
+- native/headless dedicated-server startup;
+- lightweight lobby/status UI needed to connect and play.
+
+Do not add accounts, persistence, ranked ladders, payments, inventory,
+monetisation, social graphs, complex matchmaking, multiple maps, polished art,
+or third-party addons in this slice.
+
+## Multiplayer invariants
+
+- The server is the only authority for score, eliminations, possession, ball
+  state, match clock, slot assignment and bot substitution.
+- Clients send player intent, never authoritative outcomes.
+- A connected human replaces only the bot assigned to that slot.
+- A disconnected human is replaced by a bot without ending the match.
+- Team identity is immutable during an active match.
+- Friendly-fire hits do not score.
+- One live throw can score at most one elimination.
+- Browser clients never host the public match; the public server is native or
+  headless and accepts WebSocket clients.
 
 ## Godot conventions
 
 - Target Godot 4.x.
-- Use GDScript for the pilot.
+- Use GDScript.
 - Prefer typed variables, typed parameters, and typed return values.
 - Use `snake_case` for files, variables, and functions.
 - Use `PascalCase` for named classes.
-- Keep scene-specific logic close to its scene.
-- Prefer signals over hard-coded cross-scene paths.
-- Avoid global singletons unless the specification explicitly requires one.
-- Do not hand-edit imported Godot metadata.
+- Prefer signals and explicit ownership boundaries over global mutable state.
+- Avoid third-party addons for the vertical slice.
 
 ## Git rules
 
 - Never commit directly to `main`.
-- Use one branch and pull request per scoped issue.
+- Keep product-expansion work on the approved feature branch until reviewed.
 - Do not modify unrelated files.
 - Use clear commit messages.
-- Never mark work complete without automated validation evidence and recorded
-  manual play-test requirements.
+- Do not claim browser or network validation that was not actually run.
 
-## Definition of done
+## Definition of done for this branch
 
-A task is complete only when:
+The branch is a usable vertical slice when:
 
-- Its acceptance criteria pass.
-- The project opens without parse errors.
-- Complete automated regression and headless validation succeeds.
-- Relevant manual play-test checks are recorded.
-- No out-of-scope features were added.
+- the legacy prototype still parses;
+- the multiplayer scene can run a 2v2 match with bots filling empty slots;
+- two real clients can connect to a native/headless server and occupy different
+  match slots;
+- movement, pickup, charged throw, catch, dodge, hit, respawn, scoring and the
+  match clock are server-authoritative;
+- the same client build is suitable for Godot Web export;
+- disconnecting a client replaces that player with a bot;
+- a documented local validation procedure exists for server, desktop clients,
+  and browser clients.
