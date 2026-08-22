@@ -1,8 +1,16 @@
 # Dodgeball FPS
 
-A playable Godot 4 vertical slice for a first-person dodgeball game.
+## 2v2 browser multiplayer branch
 
-## Pilot goal
+The `feature/2v2-browser-multiplayer-slice` branch is now the approved product-expansion path. Its default scene is a 2v2 team match with four fixed slots, three balls, bot fill, a three-minute score clock, respawns, first-person movement, pickup, charged throws, catching and lateral dodges.
+
+The browser/client transport is Godot high-level multiplayer over WebSockets. A native/headless Godot process is authoritative for player simulation, possession, ball physics, catches, hits, score and match time. Human connections replace bots; disconnecting returns that slot to bot control.
+
+See `docs/MULTIPLAYER_SLICE.md` for server/client commands, browser export instructions, validation steps and known limitations.
+
+The original M7 one-human-versus-one-bot prototype remains available as `scenes/main.tscn` and is retained as a regression/reference implementation.
+
+## Original pilot goal
 
 Prove the core loop:
 
@@ -14,28 +22,22 @@ Prove the core loop:
 6. Dodge laterally.
 7. Resolve an elimination and automatically start the next round.
 
-## Scope
+## Original prototype scope
 
-The pilot uses one stylized indoor court, one player, one ball, and one simple
-ball-playing bot. It excludes multiplayer, polished art, progression,
-complex AI, complex menus, and production release work. A basic pause overlay
-provides resume, clean round restart, controls, and quit actions.
+The completed pilot uses one stylized indoor court, one player, one ball, and one simple ball-playing bot. It excludes multiplayer, polished art, progression, complex AI, complex menus, and production release work. A basic pause overlay provides resume, clean round restart, controls, and quit actions.
 
 ## Visual style
 
-The court uses a clean painted-gym palette: bright blue for the player half,
-coral red for the opponent half, court green for the centre strip and perimeter,
-and warm-white lines. Dove-grey walls, dark-navy lower trim, a light-grey
-ceiling, and charcoal accents keep the ball, bot, crosshair, and boundaries
-easy to distinguish.
+The court uses a clean painted-gym palette: bright blue for the player half, coral red for the opponent half, court green for the centre strip and perimeter, and warm-white lines. Dove-grey walls, dark-navy lower trim, a light-grey ceiling, and charcoal accents keep the ball, bot, crosshair, and boundaries easy to distinguish.
 
 ## Project controls
 
-- `AGENTS.md` — permanent rules for AI coding agents.
-- `docs/SPEC.md` — required behaviour and acceptance criteria.
-- `docs/ARCHITECTURE.md` — intended Godot structure.
-- `docs/TASKS.md` — ordered implementation queue.
-- `docs/TESTING.md` — automated correctness validation.
+- `AGENTS.md` — current branch rules for AI coding agents.
+- `docs/MULTIPLAYER_SLICE.md` — current 2v2 networking scope and validation.
+- `docs/SPEC.md` — original pilot behaviour and acceptance criteria.
+- `docs/ARCHITECTURE.md` — original prototype architecture.
+- `docs/TASKS.md` — original implementation queue.
+- `docs/TESTING.md` — original automated correctness validation.
 - `docs/MILESTONES.md` — prototype implementation history and status.
 - `docs/GAME_DESIGN.md` — long-term product intent and experience.
 - `docs/GAMEPLAY_RULES.md` — current-versus-future rules and variations.
@@ -46,56 +48,25 @@ easy to distinguish.
 - `docs/KNOWN_LIMITATIONS.md` — limitations and unresolved questions.
 - `docs/PLAYTESTING.md` — interactive validation strategy.
 
-Implementation through M7 is complete, including the live/dead-ball lifecycle,
-basic bot exchange loop, and automatic round resolution/reset. Final prototype
-validation (M8) and the separately pending manual render-quality comparison
-(M5.2) remain.
+Implementation through M7 of the original prototype is complete, including the live/dead-ball lifecycle, basic bot exchange loop, and automatic round resolution/reset. Final prototype validation (M8) and the separately pending manual render-quality comparison (M5.2) remain historical validation gates for that path.
 
 ## Controls
 
 - `WASD`: move
 - Mouse: aim/look
 - `Shift`: hold to sprint
-- `Ctrl`: hold to crouch
+- `Ctrl`: crouch in the legacy prototype
 - `Space`: jump
 - Left mouse: hold to charge, release to throw
 - Right mouse: timed catch
 - `E`: pick up/interact
 - `Q`: dodge left
 - `F`: dodge right
-- `R`: restart the current round
-- `F3`: toggle performance diagnostics
-- `Escape`: toggle the pause menu
 
-The bot retrieves the single available ball, faces the player, waits briefly,
-and throws. Catch with right mouse, dodge with Q/F, or retrieve a miss and throw
-it back. Only a direct live throw can eliminate the other participant; the
-first court-surface collision makes a throw dead, so later bounces cannot
-eliminate or be caught. A valid elimination displays `PLAYER WINS` or `BOT
-WINS`, locks gameplay for two seconds, then resets the existing player, bot,
-and ball in place and begins the next round automatically.
+## Legacy prototype behaviour
 
-The pause menu releases the mouse and pauses gameplay. It includes Resume,
-Restart Round, Controls, and Quit Game; restarting closes the menu and restores
-the existing player, ball, and bot without creating replacements.
+The original bot retrieves the single available ball, faces the player, waits briefly, and throws. Catch with right mouse, dodge with Q/F, or retrieve a miss and throw it back. Only a direct live throw can eliminate the other participant; the first court-surface collision makes a throw dead, so later bounces cannot eliminate or be caught. A valid elimination displays the winner, locks gameplay briefly, then resets the existing player, bot, and ball in place and begins the next round automatically.
 
-## Known limitations
+## Current multiplayer limitations
 
-The bot uses deterministic retrieve, aim, and throw behaviour and does not catch
-or dodge. There is no scoring, rounds-to-win system, match timer, multiplayer,
-controller support, or progression. Final interactive prototype validation and
-the M5.2 render-quality comparison are still pending.
-
-## Performance diagnostics
-
-Physics interpolation is enabled to smooth visual motion between fixed physics
-updates. An F3 overlay shows FPS, current, rolling-average, and short-window
-maximum frame time, physics-processing time, draw calls, and rendered object
-count. It updates four times per second. Use a release/editor play session to
-identify the limiting area before reducing visual quality:
-
-- Low FPS with high frame time suggests rendering or general frame load.
-- High physics time suggests collision or gameplay processing.
-- High draw calls or object count suggests scene/render batching work.
-- Stable metrics with visibly uneven movement suggests frame pacing, display
-  synchronization, or hardware/driver configuration rather than court design.
+The new 2v2 branch is a first networking pass, not a production service. It has no account system, matchmaking backend, persistence, ranked ladder, progression, cosmetics or regional fleet. WAN interpolation, anti-cheat, browser deployment, TLS/WSS termination and real public-server load still require validation and iteration.
