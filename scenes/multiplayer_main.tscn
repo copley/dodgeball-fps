@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/court.tscn" id="1_court"]
 [ext_resource type="Script" path="res://scripts/multiplayer_main.gd" id="2_script"]
+[ext_resource type="Script" path="res://scripts/server_authority_bootstrap.gd" id="3_bootstrap"]
 
 [sub_resource type="Environment" id="Environment_multiplayer"]
 background_mode = 1
@@ -23,6 +24,9 @@ content_margin_bottom = 8.0
 
 [node name="MultiplayerMain" type="Node3D"]
 script = ExtResource("2_script")
+
+[node name="ServerAuthorityBootstrap" type="Node" parent="."]
+script = ExtResource("3_bootstrap")
 
 [node name="Court" parent="." instance=ExtResource("1_court")]
 
