@@ -28,6 +28,18 @@ for test_script in tests/*.gd; do
 done
 ```
 
+The multiplayer-specific deterministic suite is:
+
+```bash
+godot --headless --path . --script tests/test_multiplayer_slice.gd
+```
+
+It covers the four fixed team slots, three authoritative balls, input
+sanitization, half-court movement, dodge cooldown, single possession, charged
+throw speeds, catches, friendly-fire rejection, single scoring, respawn,
+match reset, bot fill and ownership consistency. Real WebSocket process tests
+remain required for slot assignment and disconnect substitution.
+
 Any parser error, missing resource, invalid node path, or non-zero exit status blocks completion.
 
 The focused complete-round-loop suite is:

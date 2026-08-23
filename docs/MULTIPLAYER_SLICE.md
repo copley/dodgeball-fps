@@ -53,7 +53,6 @@ process. For production hosting, terminate TLS at a reverse proxy and expose a
 - `scripts/multiplayer_main.gd` — connection, slot, bot, match and snapshot authority.
 - `scripts/net_avatar.gd` — movement, local input, prediction and snapshots.
 - `scripts/net_ball.gd` — authoritative ball possession, throws and hits.
-- `scripts/server_authority_bootstrap.gd` — switches server balls to authoritative physics after startup.
 
 The original `scenes/main.tscn`, `scripts/main.gd`, `scripts/player.gd`,
 `scripts/bot.gd` and `scripts/ball.gd` remain as the completed M7 prototype
@@ -89,14 +88,39 @@ A fifth connection remains without a playable slot in this prototype.
 ## Browser export test
 
 1. Install the matching Godot 4.7 Web export templates.
-2. Export the project for Web to `build/web/index.html`.
-3. Serve the build over HTTP using a real local web server, not `file://`.
-4. Run the native/headless server on port 9080.
-5. Open the web build in a current Chromium/Firefox browser.
-6. For a remote deployment, change the client server URL to the deployed
-   `wss://` endpoint before export.
+2. Export the project for Web:
 
-Browser clients do not host the match.
+   ```bash
+   mkdir -p build/web
+   godot --headless --path . --export-release Web build/web/index.html
+   ```
+
+3. Serve the build over HTTP using a real local web server, not `file://`:
+
+   ```bash
+   python3 -m http.server 8000 --directory build/web
+   ```
+
+4. Run the native/headless server on port 9080.
+5. Open `http://127.0.0.1:8000/?server=ws%3A%2F%2F127.0.0.1%3A9080` in a
+   current Chromium/Firefox browser.
+6. For production, supply the deployed `wss://` endpoint in the same `server`
+   query parameter. The value must be URL-encoded.
+
+The Web preset uses GL Compatibility and the single-threaded Web template, so
+it does not require cross-origin isolation headers. Browser clients do not host
+the match.
+
+## Automated multiplayer test
+
+Run the focused server-authority and gameplay suite:
+
+```bash
+godot --headless --path . --script tests/test_multiplayer_slice.gd
+```
+
+This complements, rather than replaces, the multi-process and interactive
+browser checks below.
 
 ## Required validation before calling the slice complete
 
@@ -136,4 +160,18 @@ Interactive network checks:
 - Snapshot interpolation is intentionally simple and will need tuning under real WAN latency.
 - Input validation and anti-cheat are minimal beyond server ownership of outcomes.
 - Production browser hosting still needs HTTPS/WSS, deployment automation and regional servers.
-- The multiplayer branch has to be run through Godot parser/headless validation on a machine with Godot 4.7 installed before it should be merged.
+
+## Validation record — 2026-08-23
+
+- Godot 4.7.2 import/parser validation exits cleanly.
+- The dedicated headless server starts with four bot-filled slots, three
+  authoritative balls and a 180-second clock.
+- Four sequential headless WebSocket clients receive Blue 1, Blue 2, Red 1 and
+  Red 2. Disconnecting Blue 2 restores bot control to slot 1.
+- The focused multiplayer suite and all legacy prototype suites pass.
+- The release Web export completes to `build/web/index.html`, uses the
+  single-threaded template, and serves the HTML, WASM and PCK with correct MIME
+  types from Python's local HTTP server.
+- Interactive rendering, mouse-look feel and play from real browser windows
+  remain manual checks. The validation environment's cloud browser cannot
+  access the workspace-local HTTP server.

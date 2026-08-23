@@ -17,6 +17,7 @@ const CATCH_RANGE := 2.35
 const MIN_THROW_SPEED := 9.0
 const MAX_THROW_SPEED := 22.0
 const FULL_CHARGE_SECONDS := 1.0
+const INPUT_TIMEOUT_SECONDS := 0.5
 
 @onready var court: Node3D = $Court
 @onready var connection_label: Label = $UI/Connection
@@ -31,6 +32,8 @@ var peer_to_slot: Dictionary = {}
 var slot_peer: Array[int] = [-1, -1, -1, -1]
 var slot_human: Array[bool] = [false, false, false, false]
 var slot_input: Array[Dictionary] = [{}, {}, {}, {}]
+var slot_input_age: Array[float] = [0.0, 0.0, 0.0, 0.0]
+var slot_last_input_frame: Array[int] = [-1, -1, -1, -1]
 var slot_last_throw: Array[bool] = [false, false, false, false]
 var slot_last_pickup: Array[bool] = [false, false, false, false]
 var slot_last_catch: Array[bool] = [false, false, false, false]
@@ -46,16 +49,21 @@ var is_server_instance: bool = false
 var server_url: String = DEFAULT_SERVER_URL
 var server_port: int = DEFAULT_PORT
 var connection_ready: bool = false
+var network_startup_enabled: bool = true
+var websocket_peer: WebSocketMultiplayerPeer
 
 
 func _ready() -> void:
-	_spawn_match_entities()
 	_configure_from_arguments()
-	_bind_multiplayer_signals()
-	if is_server_instance:
-		_start_server()
+	_spawn_match_entities()
+	if network_startup_enabled:
+		_bind_multiplayer_signals()
+		if is_server_instance:
+			_start_server()
+		else:
+			_start_client()
 	else:
-		_start_client()
+		connection_ready = true
 	_update_hud()
 
 
@@ -66,9 +74,29 @@ func _configure_from_arguments() -> void:
 		elif arg.begins_with("--port="):
 			server_port = int(arg.trim_prefix("--port="))
 		elif arg.begins_with("--url="):
-			server_url = arg.trim_prefix("--url=")
-	if DisplayServer.get_name() == "headless":
-		is_server_instance = true
+			var requested_url := arg.trim_prefix("--url=")
+			if _is_supported_server_url(requested_url):
+				server_url = requested_url
+			else:
+				push_warning("Ignoring invalid WebSocket server URL: %s" % requested_url)
+	if OS.has_feature("web"):
+		var browser_url := _browser_server_url()
+		if not browser_url.is_empty():
+			server_url = browser_url
+
+
+func _browser_server_url() -> String:
+	var value: Variant = JavaScriptBridge.eval(
+		"new URLSearchParams(window.location.search).get('server') || ''",
+		true
+	)
+	if value is String and _is_supported_server_url(value):
+		return value
+	return ""
+
+
+func _is_supported_server_url(value: String) -> bool:
+	return value.begins_with("ws://") or value.begins_with("wss://")
 
 
 func _bind_multiplayer_signals() -> void:
@@ -80,27 +108,28 @@ func _bind_multiplayer_signals() -> void:
 
 
 func _start_server() -> void:
-	var peer := WebSocketMultiplayerPeer.new()
-	var error := peer.create_server(server_port)
+	websocket_peer = WebSocketMultiplayerPeer.new()
+	var error := websocket_peer.create_server(server_port)
 	if error != OK:
 		connection_label.text = "SERVER ERROR: %s" % error_string(error)
 		push_error(connection_label.text)
 		return
-	multiplayer.multiplayer_peer = peer
+	multiplayer.multiplayer_peer = websocket_peer
 	connection_ready = true
 	connection_label.text = "SERVER :%d — 4 bots waiting" % server_port
 	role_label.text = "DEDICATED SERVER"
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	print("2v2 dodgeball server listening on ws://0.0.0.0:%d" % server_port)
+	print("Match ready: %d bot-filled slots, %d authoritative balls, %.0f second clock" % [SLOT_COUNT, BALL_COUNT, MATCH_SECONDS])
 
 
 func _start_client() -> void:
-	var peer := WebSocketMultiplayerPeer.new()
-	var error := peer.create_client(server_url)
+	websocket_peer = WebSocketMultiplayerPeer.new()
+	var error := websocket_peer.create_client(server_url)
 	if error != OK:
 		connection_label.text = "CONNECT ERROR: %s" % error_string(error)
 		return
-	multiplayer.multiplayer_peer = peer
+	multiplayer.multiplayer_peer = websocket_peer
 	connection_label.text = "CONNECTING %s" % server_url
 	role_label.text = "WAITING FOR SLOT"
 
@@ -135,6 +164,8 @@ func _on_peer_connected(peer_id: int) -> void:
 	slot_peer[slot] = peer_id
 	slot_human[slot] = true
 	slot_input[slot] = {}
+	slot_input_age[slot] = 0.0
+	slot_last_input_frame[slot] = -1
 	assign_slot.rpc_id(peer_id, slot)
 	print("Peer %d joined slot %d team %d" % [peer_id, slot, _team_for_slot(slot)])
 
@@ -147,6 +178,8 @@ func _on_peer_disconnected(peer_id: int) -> void:
 	slot_peer[slot] = -1
 	slot_human[slot] = false
 	slot_input[slot] = {}
+	slot_input_age[slot] = 0.0
+	slot_last_input_frame[slot] = -1
 	slot_last_throw[slot] = false
 	slot_last_pickup[slot] = false
 	slot_last_catch[slot] = false
@@ -167,6 +200,7 @@ func assign_slot(slot: int) -> void:
 		avatar.set_local_player(avatar.slot_id == local_slot)
 	role_label.text = "BLUE %d" % (slot + 1) if _team_for_slot(slot) == 0 else "RED %d" % (slot - 1)
 	connection_label.text = "CONNECTED — BOT REPLACED"
+	print("Assigned local player to %s" % role_label.text)
 
 
 @rpc("any_peer", "call_remote", "unreliable", 1)
@@ -177,8 +211,40 @@ func submit_input(frame: int, input_state: Dictionary) -> void:
 	if not peer_to_slot.has(peer_id):
 		return
 	var slot: int = int(peer_to_slot[peer_id])
-	input_state["frame"] = frame
-	slot_input[slot] = input_state
+	if frame <= slot_last_input_frame[slot]:
+		return
+	slot_last_input_frame[slot] = frame
+	slot_input_age[slot] = 0.0
+	slot_input[slot] = _sanitize_input(input_state, avatars[slot])
+
+
+func _sanitize_input(input_state: Dictionary, avatar: NetAvatar) -> Dictionary:
+	var move := Vector2.ZERO
+	var move_value: Variant = input_state.get("move", Vector2.ZERO)
+	if move_value is Vector2:
+		move = (move_value as Vector2).limit_length(1.0)
+	var yaw_value := float(input_state.get("yaw", avatar.yaw))
+	if not is_finite(yaw_value):
+		yaw_value = avatar.yaw
+	var pitch_value := float(input_state.get("pitch", avatar.pitch))
+	if not is_finite(pitch_value):
+		pitch_value = avatar.pitch
+	return {
+		"move": move,
+		"yaw": wrapf(yaw_value, -PI, PI),
+		"pitch": clampf(pitch_value, deg_to_rad(-85.0), deg_to_rad(85.0)),
+		"sprint": bool(input_state.get("sprint", false)),
+		"jump": bool(input_state.get("jump", false)),
+		"dodge_left": bool(input_state.get("dodge_left", false)),
+		"dodge_right": bool(input_state.get("dodge_right", false)),
+		"pickup": bool(input_state.get("pickup", false)),
+		"catch": bool(input_state.get("catch", false)),
+		"throw": bool(input_state.get("throw", false)),
+	}
+
+
+func _neutral_input(avatar: NetAvatar) -> Dictionary:
+	return _sanitize_input({}, avatar)
 
 
 func _physics_process(delta: float) -> void:
@@ -217,7 +283,8 @@ func _server_tick(delta: float) -> void:
 
 		var input_state: Dictionary
 		if slot_human[slot]:
-			input_state = slot_input[slot]
+			slot_input_age[slot] += delta
+			input_state = slot_input[slot] if slot_input_age[slot] <= INPUT_TIMEOUT_SECONDS else _neutral_input(avatar)
 		else:
 			input_state = _build_bot_input(slot)
 		avatar.simulate(input_state, delta, true)
@@ -226,8 +293,18 @@ func _server_tick(delta: float) -> void:
 	snapshot_accumulator += delta
 	if snapshot_accumulator >= SNAPSHOT_INTERVAL:
 		snapshot_accumulator = 0.0
-		receive_snapshot.rpc(_build_snapshot())
+		var snapshot := _build_snapshot()
+		for peer_id: int in peer_to_slot:
+			if _peer_is_open(peer_id):
+				receive_snapshot.rpc_id(peer_id, snapshot)
 	_update_hud()
+
+
+func _peer_is_open(peer_id: int) -> bool:
+	if websocket_peer == null:
+		return false
+	var connection := websocket_peer.get_peer(peer_id)
+	return connection != null and connection.get_ready_state() == WebSocketPeer.STATE_OPEN
 
 
 func _process_slot_actions(slot: int, input_state: Dictionary, delta: float) -> void:
@@ -411,6 +488,9 @@ func _reset_match() -> void:
 		slot_respawn_remaining[slot] = 0.0
 		slot_charge[slot] = 0.0
 		slot_catch_remaining[slot] = 0.0
+		slot_last_throw[slot] = false
+		slot_last_pickup[slot] = false
+		slot_last_catch[slot] = false
 	for ball_index in BALL_COUNT:
 		balls[ball_index].reset_to(_ball_spawn(ball_index))
 
@@ -425,17 +505,10 @@ func _spawn_match_entities() -> void:
 	for ball_index in BALL_COUNT:
 		var ball := BALL_SCENE.instantiate() as NetBall
 		add_child(ball)
-		ball.configure(ball_index, false)
+		ball.configure(ball_index, is_server_instance)
 		ball.reset_to(_ball_spawn(ball_index))
 		ball.authoritative_player_hit.connect(_on_authoritative_player_hit)
 		balls.append(ball)
-
-
-func _set_entities_authoritative() -> void:
-	for ball: NetBall in balls:
-		ball.authoritative = true
-		ball.freeze = false
-		ball.reset_to(ball.spawn_transform)
 
 
 func _spawn_for_slot(slot: int) -> Transform3D:

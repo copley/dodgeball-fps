@@ -69,6 +69,7 @@ func _test_dead_ball_restrictions() -> void:
 	var player := main.player as PlayerController
 	var ball := main.ball as Dodgeball
 	var bot := main.bot as BotController
+	bot.set_gameplay_enabled(false)
 	var target_hit_count: Array[int] = [0]
 	ball.valid_bot_hit.connect(func(_bot: BotController) -> void: target_hit_count[0] += 1)
 	_throw_from(ball, Vector3(5.0, 1.5, 5.0), Vector3.DOWN, 12.0)
@@ -91,6 +92,7 @@ func _test_dead_ball_availability_and_rethrow() -> void:
 	var main := await _spawn_main()
 	var player := main.player as PlayerController
 	var ball := main.ball as Dodgeball
+	(main.bot as BotController).set_gameplay_enabled(false)
 	_throw_from(ball, Vector3(5.0, 1.5, 5.0), Vector3.DOWN, 12.0)
 	_expect(await _wait_for_state(ball, Dodgeball.BallState.DEAD), "surface contact prepares availability checks")
 	ball.seconds_since_throw = ball.pickup_grace_seconds

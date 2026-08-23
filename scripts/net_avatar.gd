@@ -79,8 +79,12 @@ func simulate(input_state: Dictionary, delta: float, enforce_half: bool = true) 
 	if not is_alive:
 		velocity = Vector3.ZERO
 		return
-	yaw = float(input_state.get("yaw", yaw))
-	pitch = float(input_state.get("pitch", pitch))
+	yaw = wrapf(float(input_state.get("yaw", yaw)), -PI, PI)
+	pitch = clampf(
+		float(input_state.get("pitch", pitch)),
+		deg_to_rad(-85.0),
+		deg_to_rad(85.0)
+	)
 	rotation.y = yaw
 	$Head.rotation.x = pitch
 
@@ -104,6 +108,7 @@ func simulate(input_state: Dictionary, delta: float, enforce_half: bool = true) 
 			dodge_cooldown_remaining = dodge_cooldown
 
 		var move_input: Vector2 = input_state.get("move", Vector2.ZERO)
+		move_input = move_input.limit_length(1.0)
 		var move_direction := (transform.basis * Vector3(move_input.x, 0.0, move_input.y)).normalized()
 		var target_speed := sprint_speed if bool(input_state.get("sprint", false)) else move_speed
 		var target_velocity := move_direction * target_speed

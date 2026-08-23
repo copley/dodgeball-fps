@@ -24,6 +24,7 @@ func _run() -> void:
 
 func _test_initial_state_and_player_win() -> void:
 	var main := await _spawn_main()
+	main.bot.set_physics_process(false)
 	main.inter_round_delay = 0.03
 	var result_count: Array[int] = [0]
 	main.round_ended.connect(func(_winner: int) -> void: result_count[0] += 1)
@@ -107,6 +108,7 @@ func _test_repeated_resets_and_twenty_rounds() -> void:
 	_expect(_entity_counts_are_one(main), "five manual resets retain one of each entity")
 	_expect(main.round_ended.get_connections().size() == 0, "manual resets do not add result connections")
 	main.inter_round_delay = 0.001
+	main.bot.set_physics_process(false)
 	var result_count: Array[int] = [0]
 	var reset_count: Array[int] = [0]
 	main.round_ended.connect(func(_winner: int) -> void: result_count[0] += 1)
@@ -119,6 +121,7 @@ func _test_repeated_resets_and_twenty_rounds() -> void:
 	_expect(result_count[0] == 20, "twenty rounds emit one result each")
 	_expect(reset_count[0] == 20, "twenty rounds perform one reset each")
 	_expect(main.automatic_reset_count == 20, "twenty rounds leave no stale automatic timers")
+	main.bot.set_physics_process(true)
 	main.bot.aim_delay = 0.0
 	main.ball.reset_to(Transform3D(Basis.IDENTITY, main.bot.global_position + Vector3(0.0, 0.5, -0.7)))
 	_expect(await _wait_for_bot_throw(main.bot), "bot retrieves and throws after automatic reset")
